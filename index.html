@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MMD</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="lib/jszip.min.js"></script>
+    <script src="lib/jszip.until.js"></script>
+    <script type="module" src="get.js"></script>
+    <script src="help.js"></script>
+</head>
+<body>
+    <div class="main-content">
+        <div class="inner">
+            <div class="top-bar">
+                <div class="top-bar-list">
+                    <div class="top-select open-drop-menu">File</div>
+                    <div class="top-select">Info</div>
+                    <div class="top-select">Beta</div>
+                </div>
+                <div class="menus">
+                    <div class="menu-box file-drop-menu">
+                        <div class="item-box-menu open-zip-mode">Open Zip (To Model)</div>
+                        <div class="item-box-menu open-zip-mode-map">Open Zip (To Map)</div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="left-menu">
+                    <div class="lf-container">
+                        <div class="top-selection">
+                            <div class="option-lf" data-for="#setup-render">Setup</div>
+                        </div>
+                        <div class="list-container">
+                            <div class="cont-item -option-show-" id="setup-render">
+                                <div class="cs-btn" id="load-all">Load All</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="render">
+                    <div class="render-contaner">
+                        <iframe src="renderFrame/render.html" id="main-render"></iframe>
+                    </div>
+                    <div class="bottom-tool">
+                        <div class="time-panel">
+                            <div class="bar-time animation-time">
+                                <div class="bar-time-current">00:00</div>
+                                <div class="bar-progress"><div class="prog-bar"></div><div class="overlay"></div></div>
+                                <div class="bar-time-duration">00:00</div>
+                            </div>
+                            <div class="time-control">
+                                <div class="pri-control">
+                                    <div class="cs-btn play-mode">P</div>
+                                    <div class="cs-btn play-sync">Sync</div>
+                                    <div class="cs-btn get-render-image">Screenshot</div>
+                                </div>
+                                <div class="sec-control">
+                                    <div class="time-sync">
+                                        <div>00</div>
+                                        <div>25</div>
+                                        <div>50</div>
+                                        <div>75</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bar-time camera-time">
+                                <div class="bar-time-current">00:00</div>
+                                <div class="bar-progress"><div class="prog-bar"></div><div class="overlay"></div></div>
+                                <div class="bar-time-duration">00:00</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="right-menu">
+                    <div class="rt-container">
+                        <div class="top-selection">
+                            <div class="option-rt" data-for="#mesh-view-option">Mesh View</div>
+                            <div class="option-rt" data-for="#graph-render-option">Graph</div>
+                        </div>
+                        <div class="list-container">
+                            <div class="cont-item -option-show-" id="mesh-view-option"></div>
+                            <div class="cont-item" id="graph-render-option">
+                                <div class="graph-title">Qualiti</div>
+                                <select class="cs-select-input" id="graph-render-qualiti">
+                                    <option value="500">500</option>
+                                    <option value="720">720</option>
+                                    <option value="1080">1080</option>
+                                    <option value="auto" selected>auto</option>
+                                </select>
+                                <div class="graph-title">Qualiti +</div>
+                                <select class="cs-select-input" id="graph-render-qualiti-plus"><option value="0.5">0.5</option><option value="0.6">0.6</option><option value="0.7">0.7</option><option value="0.8">0.8</option><option value="0.9">0.9</option>
+                                    <option value="1" selected>1.0</option>
+                                    <option value="1.2">1.2</option><option value="1.4">1.4</option><option value="1.6">1.6</option><option value="1.7">1.7</option><option value="1.8">1.8</option><option value="1.9">1.9</option><option value="2">2.0</option>
+                                </select>
+                                <div class="graph-title">Render ratio</div>
+                                <select class="cs-select-input" id="graph-render-ratio">
+                                    <option value="4:3">4:3</option>
+                                    <option value="16:9">16:9</option>
+                                    <option value="32:9">32:9</option>
+                                    <option value="auto" selected>auto</option>
+                                </select>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom-bar"></div>
+        </div>
+    </div>
+</body>
+</html>

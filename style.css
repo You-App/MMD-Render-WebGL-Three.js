@@ -1,0 +1,403 @@
+:root{
+    --background: #000;
+    --color: #fff;
+    --light: #00ffff;
+    --top-bar: 25px;
+    --bottom-bar: 25px;
+    --left-menu: 25%;
+    --right-menu: 20%;
+    --border-size: 2px;
+    --border-color: #ddd;
+    --border-type: solid;
+    --cursor-def: url("");
+    --cursor-poi: url("");
+    --cursor-not-allowed: url("");
+}
+.active-option-{
+    color: var(--light) !important;
+    border: var(--border-size) var(--border-type) var(--light) !important;
+}
+.cs-select-input{
+    color: var(--color) !important;
+    background-color: var(--background) !important;
+    border: var(--border-size) var(--border-type) var(--border-color) !important;
+    outline: none !important;
+    padding: 5px;
+}
+.cs-btn{
+    background-color: var(--background);
+    border: var(--border-size) var(--border-type) var(--border-color);
+    color: var(--color);
+    user-select: none;
+    cursor: var(--cursor-poi), pointer;
+    outline: none !important;
+}
+.cs-btn:hover{
+    border: var(--border-size) var(--border-type) var(--light);
+    color: var(--light);
+}
+.cs-btn[data-work="false"]{
+    cursor: var(--cursor-not-allowed), not-allowed;
+}
+::-webkit-scrollbar {
+    height: 0px;
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #434343;
+}
+::-webkit-scrollbar-thumb {
+    background: #ffffff68;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #eaeaeab0;
+}
+.overlay{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 4;
+}
+.main-content{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-color: var(--background);
+    color: var(--color);
+    cursor: var(--cursor-def), auto;
+}
+.inner{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+}
+.top-bar{
+    position: relative;
+    height: var(--top-bar);
+    width: 100%;
+    border-bottom: var(--border-size) var(--border-type) var(--border-color);
+}
+.top-bar-list{
+    user-select: none;
+    display: flex;
+    flex-direction: row;
+}
+.top-select{
+    position: relative;
+    padding: 0px 5px 0px 5px;
+    font-size: 1.3em;
+    cursor: var(--cursor-poi), pointer;
+}
+.menu-box{
+    position: absolute;
+    user-select: none;
+    display: none;
+    padding: 5px;
+    z-index: 10;
+    min-width: 100px;
+    min-height: 100px;
+    background-color: var(--background);
+    border: var(--border-size) var(--border-type) var(--border-color);
+
+}
+.item-box-menu{
+    position: relative;
+    font-size: 1.1em;
+    margin: 2px;
+    cursor: var(--cursor-poi), pointer;
+}
+.item-box-menu:hover{
+    color: var(--light);
+}
+.content{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    height: calc(100% - var(--top-bar) - var(--bottom-bar) - var(--border-size) - var(--border-size));
+}
+.left-menu{
+    position: relative;
+    width: calc(var(--left-menu) - var(--border-size));
+    height: 100%;
+    border-right: var(--border-size) var(--border-type) var(--border-color);
+    user-select: none;
+}
+.lf-container, .rt-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.top-selection {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    border-bottom: var(--border-size) var(--border-type) var(--border-color);
+}
+.option-lf, .option-rt {
+    font-size: 2em;
+    position: relative;
+    padding: 0px 5px 0px 5px;
+    user-select: none;
+    cursor: var(--cursor-poi), pointer;
+    border: var(--border-size) var(--border-type) var(--border-color);
+    border-bottom: none;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+.option-lf:hover, .option-rt:hover {
+    color: var(--light);
+}
+.cont-item {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    display: none;
+}
+.list-container {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 50px);
+}
+.-option-show-{
+    display: block !important; 
+}
+
+.render{
+    position: relative;
+    height: 100%;
+    width: calc(100% - var(--left-menu) - var(--right-menu));
+}
+.render-contaner {
+    position: relative;
+    width: 100%;
+    height: 80%;
+    overflow: hidden;
+}
+.bottom-tool {
+    position: relative;
+    width: 100%;
+    height: 20%;
+    border-top: var(--border-size) var(--border-type) var(--border-color);
+}
+.time-panel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.bar-time{
+    position: relative;
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+.bar-time-current, .bar-time-duration{
+    position: relative;
+    font-size: 1.8em;
+}
+.bar-progress{
+    position: relative;
+    background-color: #5e5e5e;
+    width: calc(100% - 150px);
+    height: 20px;
+}
+.prog-bar{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 30%;
+    background-color: #00c500;
+}
+.time-control {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 45px;
+}
+.sec-control, .pri-control {
+    width: 49%;
+    position: relative;
+}
+.pri-control{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    font-size: 2em;
+}
+.pri-control > .cs-btn{
+    padding: 2px 5px 2px 5px;
+    margin-left: 15px;
+    border: var(--border-size) var(--border-type) var(--border-color);
+    cursor: var(--cursor-poi), pointer;
+    padding: 2px 5px 2px 5px;
+}
+.time-sync {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    font-size: 2em;
+}
+.time-sync > div {
+    padding: 2px 5px 2px 5px;
+    text-align: center;
+    margin-right: 15px;
+    border: var(--border-size) var(--border-type) var(--border-color);
+    cursor: var(--cursor-poi), pointer;
+}
+#main-render{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.right-menu{
+    position: relative;
+    width: calc(var(--right-menu) - var(--border-size));
+    height: 100%;
+    border-left: var(--border-size) var(--border-type) var(--border-color);
+}
+.bottom-bar{
+    position: relative;
+    height: var(--bottom-bar);
+    width: 100%;
+    border-top: var(--border-size) var(--border-type) var(--border-color);
+    user-select: none;
+}
+
+
+.mesh-view-box {
+    position: relative;
+    width: 100%;
+    /* height: 100%; */
+}
+.mesh-select {
+    position: relative;
+    font-size: 2em;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    height: 80px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    flex-wrap: wrap;
+}
+.mesh-item {
+    padding: 0px 10px 0px 10px;
+    text-align: center;
+    border: var(--border-size) var(--border-type) var(--border-color);
+    white-space: nowrap;
+    cursor: var(--cursor-poi), pointer;
+    max-width: 40%;
+    height: 35px;
+    overflow: hidden;
+}
+.mesh-item:hover {
+    color: var(--light);
+}
+.mesh-option {
+    display: none;
+    position: relative;
+    height: calc(100% - 40px);
+    border-top: var(--border-size) var(--border-type) var(--border-color);
+}
+.mesh-show {
+    font-size: 1.5em;
+    position: relative;
+    text-align: center;
+    user-select: none;
+    padding: 2px;
+}
+.mesh-value {
+    position: relative;
+    min-height: 15px;
+    max-height: 500px;
+    overflow-y: scroll;
+}
+.material-item {
+    position: relative;
+    height: 25px;
+    overflow: hidden;
+    width: 100%;
+    padding: 0px 0px 3px 0px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    border-bottom: var(--border-size) var(--border-type) transparent;
+}
+.material-item:hover {
+    border-bottom: var(--border-size) var(--border-type) var(--border-color);
+}
+.mt-name {
+    position: relative;
+    width: calc(100% - 80px);
+    height: 100%;
+}
+input.mt-name-edit {
+    position: relative;
+    background: transparent;
+    outline: none !important;
+    padding: unset;
+    border: unset;
+    color: #fff;
+    height: 100%;
+    width: 100%;
+    font-size: 1.5em;
+}
+.mt-option {
+    position: relative;
+    width: 80px;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.option-item {
+    position: relative;
+    width: 25px;
+    text-align: center;
+    border: 1px solid #ddd;
+    margin: 2px;
+    user-select: none;
+    font-size: 1.1em;
+}
+.option-item[data-active="false"] {
+    border-color: #eded00;
+    color: #eded00;
+}
+.option-item:hover{
+    border: 1px solid var(--light);
+}
+.misc-title {
+    position: relative;
+    font-size: 2em;
+}
+.misc-box {
+    display: flex;
+    flex-direction: row;
+}
+.misc-inner-title {
+    font-size: 1.4em;
+    padding: 0px 3px 0px 3px;
+}
+input.input-mesh-option {
+    position: relative;
+    background: transparent;
+    color: #fff;
+    outline: unset !important;
+    border: var(--border-size) var(--border-type) var(--border-color);
+    width: calc(30% - 20px);
+}

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>three.js webgl - loaders - MMD loader</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            color: #c6c6c6;
+            background: #00000000;
+            margin: 0;
+        }
+
+        .loadd {
+            position: fixed;
+            background-image: url(/img/NT-bg-3.png);
+            background-size: cover;
+            background-position: center;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9;
+        }
+
+        .load-cont {
+            position: absolute;
+            width: 100%;
+            height: 100px;
+            bottom: 10%;
+            left: 0;
+            z-index: 10;
+        }
+
+        .load-bar {
+            width: 75%;
+            height: 60px;
+            border: 3px solid #ddd;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+
+        .bar {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            height: calc(100% - 8px);
+            max-width: calc(100% - 8px);
+            background-color: #ddd;
+            /* transition: .6s ease; */
+        }
+
+        .load-progr {
+            position: absolute;
+            bottom: 40px;
+            left: 49%;
+            width: 0%;
+            white-space: nowrap;
+            color: #ddd;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .info {
+            position: fixed;
+            top: 0;
+            left: 0;
+            font-size: .8em;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
+            z-index: 9999;
+        }
+
+        canvas[data-engine] {
+            position: relative;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+
+        .container-render {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "../lib/three/build/three.module.js",
+                "three/addons/": "../lib/three/jsm/"
+            }
+        }
+    </script>
+    <script src="ammo.wasm.js"></script>
+    <script type="module" src="render.js"></script>
+
+</body>
+
+</html>

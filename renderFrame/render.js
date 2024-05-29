@@ -24,11 +24,8 @@ window.renderOption = {
 window.ready = false;
 window.clock = new THREE.Clock();
 var model_select = 0;
-var vmd_select = 0;
 window.cam_select = 0;
 var bg_select = 0;
-var ex; //32
-var comp = {load:0, all: 0}
 window.all_mesh = {};
 window.all_vmd = {};
 window.all_animation = {};

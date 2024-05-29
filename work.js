@@ -1,5 +1,4 @@
 // Code for fun, look like trash :/
-
 var render = document.querySelector(".render");
 var renderWindow = document.querySelector("#main-render");
 var fileList = document.querySelector("#setup-render");
@@ -24,6 +23,7 @@ var selection = {
 };
 var addFile = {};
 var addFileMap = {};
+var addFileVmd = {};
 var renderOption = {
     quality: "auto",
     plus: "auto",
@@ -279,6 +279,20 @@ document.querySelector("#graph-render-option").addEventListener("change", (e) =>
 document.querySelector(".time-control").addEventListener("click", (e)=>{
     var tar = e.target;
     if (tar.classList[0] == "cs-btn") {
+        if (tar.classList[1] == "play-mode") {
+            if(window.renderFrame){
+                if(renderFrame.helper){
+                    let enabled = renderFrame.helper.enabled.animation;
+                    if(enabled){
+                        renderFrame.helper.enabled.animation = false;
+                        tar.innerText = "Play"
+                    } else{
+                        renderFrame.helper.enabled.animation = true;
+                        tar.innerText = "Pause"
+                    }
+                }
+            }
+        }
         if (tar.classList[1] == "play-sync") {
             if (_sync) {
                 _sync = false;
@@ -307,6 +321,25 @@ document.querySelector(".time-control").addEventListener("click", (e)=>{
         setTimeForCam(time);
         setTimeForAnimate(selection.model[0].url, time);
 
+    }
+});
+document.querySelector(".camera-control").addEventListener("click", (e)=>{
+    var tar = e.target;
+    if (tar.classList[0] == "cs-btn") {
+        if (tar.classList[1] == "play-mode") {
+            if(window.renderFrame){
+                if(renderFrame.helper){
+                    let enabled = renderFrame.helper.enabled.cameraAnimation;
+                    if(enabled){
+                        renderFrame.helper.enabled.cameraAnimation = false;
+                        tar.innerText = "Play"
+                    } else{
+                        renderFrame.helper.enabled.cameraAnimation = true;
+                        tar.innerText = "Pause"
+                    }
+                }
+            }
+        }
     }
 });
 function secondsToTime(e = 0) {
@@ -375,11 +408,58 @@ document.querySelector(".file-drop-menu").addEventListener("click", async (e) =>
                 }
             }
         }
+        if (target.classList[1] == "open-zip-mode-vmd") {
+            if (window.showOpenFilePicker) {
+                file = await getHanderFile();
+                if(file.type == "application/zip"){
+                    let allFile = await readZip2(file, true);
+                    let key = file.name + Date.now();
+                    addFileVmd[key] = allFile;
+                    for (let i = 0; i < allFile.length; i++) {
+                        const e = allFile[i];
+                        if(e.name.endsWith(".vmd")){
+                            vmdFile.addObject({
+                                name: e.name,
+                                url: e.url,
+                            });
+                        }
+                    }
+                    
+                }
+            }
+        }
+        if (target.classList[1] == "open-zip-mode-file-cam") {
+            if (window.showOpenFilePicker) {
+                file = await getHanderFile();
+                if (file.name.endsWith(".vmd")) {
+                    cameraFile.addObject({
+                        name: file.name,
+                        url: URL.createObjectURL(file),
+                    });
+                }
+            }
+        }
+        if (target.classList[1] == "open-zip-mode-file-mot") {
+            if (window.showOpenFilePicker) {
+                file = await getHanderFile();
+                if (file.name.endsWith(".vmd")) {
+                    vmdFile.addObject({
+                        name: file.name,
+                        url: URL.createObjectURL(file)
+                    });
+                }
+            }
+        }
+    }
+});
+document.addEventListener("click", (e) => {
+    if (e.target.classList[0] !== "top-select") {
+        document.querySelector(".file-drop-menu").style.display = "";
     }
 });
 function getHanderFile(){
     return new Promise(async (resolve, reject) => {
-        let files = await window.showOpenFilePicker();
+        let files = await window.showOpenFilePicker({multiple: false});
         let file = await files[0].getFile();
         resolve(file);
     });
@@ -393,4 +473,14 @@ function downloadBlob(file, name) {
     document.body.appendChild(a);
     a.click();
     a.remove();
+}
+function getBone(key, bone){
+    if(!bone) return;
+    for (let i = 0; i < bone.length; i++) {
+    if(bone[i].name.indexOf(key) !== -1){
+        console.log(i);
+        console.log(bone[i]);
+        return bone[i];
+    }
+}
 }

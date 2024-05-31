@@ -54,7 +54,9 @@ input[type="number"]{
     border: var(--border-size) var(--border-type) var(--border-color);
     color: var(--color);
 }
-
+.mmd-item-stat {
+    display: none;
+}
 
 /*  */
 ::-webkit-scrollbar {

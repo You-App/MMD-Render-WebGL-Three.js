@@ -131,7 +131,7 @@ class FileControl{
         .mid-ct-btn:hover { border: 1px solid #00ffff; color: #00ffff; }
         .mmd-box-left { border-right: 1px solid #ddd; }
         .mmd-box-right { border-left: 1px solid #ddd; }
-        .mmd-item { display: flex; flex-direction: row; position: relative; justify-content: space-between; height: 20px; font-size: 1.1em; order: var(--s); margin-top: 2px; }
+        .mmd-item { display: flex; flex-direction: row; position: relative; justify-content: space-between; font-size: 1.1em; order: var(--s); margin-top: 2px; }
         .mmd-box-left > .mmd-item{ order: unset !important; }
         .mi-ovl { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
         .mmd-item-name{ white-space: nowrap; overflow: hidden; padding-left: 2px; }

@@ -38,7 +38,7 @@ var vmd = [
     // 0
     {
         name: "default",
-        src: "models/mmd/vmd/1/wavefile_v2.vmd"
+        src: "../models/mmd/vmd/1/wavefile_v2.vmd"
     },
     // 1
     {

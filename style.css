@@ -6,7 +6,7 @@
     --bottom-bar: 25px;
     --left-menu: 25%;
     --right-menu: 20%;
-    --border-size: 2px;
+    --border-size: 1px;
     --border-color: #ddd;
     --border-type: solid;
     --cursor-def: url("");
@@ -232,7 +232,7 @@ div#load-all {
 }
 .bar-time-current, .bar-time-duration{
     position: relative;
-    font-size: 1.8em;
+    font-size: 1.5em;
 }
 .bar-progress{
     position: relative;
@@ -253,7 +253,8 @@ div#load-all {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    height: 45px;
+    height: 40px;
+    margin: 2px 0px 2px 0px;
 }
 .sec-control, .pri-control {
     width: 49%;

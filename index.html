@@ -82,6 +82,37 @@
                                     
                                 </div>
                             </div>
+                            <div class="tit">Record Video</div>
+                            <div class="record-canvas">
+                                <div class="cs-btn rec-item start-record">Start</div>
+                                <div class="rec-item type-video">
+                                    <div class="tit">Video Type</div>
+                                    <select class="cs-select-input" id="record-type">
+                                        <option value="video/mp4">video/mp4</option>
+                                        <option value="video/webm;codecs=daala">video/webm;codecs=daala</option>
+                                        <option value="video/webm;codecs=h264" selected>video/webm;codecs=h264</option>
+                                        <option value="video/webm;codecs=vp8">video/webm;codecs=vp8</option>
+                                        <option value="video/webm">video/webm</option>
+                                    </select>
+                                </div> 
+                                <div class="rec-item fps-video">
+                                    <div class="tit">Video FPS</div>
+                                    <select class="cs-select-input" id="record-fps">
+                                        <option value="60">60</option>
+                                        <option value="45">45</option>
+                                        <option value="30" selected>30</option>
+                                        <option value="20">20</option>
+                                    </select>
+                                </div> 
+                                <div class="rec-item current-time-video">
+                                    <div class="tit">Record Time</div>
+                                    <div class="current-record">00:00</div>
+                                </div>   
+                                <div class="rec-item max-time-video">
+                                    <div class="tit">Max Time (Second)</div>
+                                    <input type="number" id="max-record" value="60">
+                                </div>    
+                            </div>
                         </div>
                     </div>
                 </div>

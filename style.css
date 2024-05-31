@@ -39,6 +39,24 @@
 .cs-btn[data-work="false"]{
     cursor: var(--cursor-not-allowed), not-allowed;
 }
+input[type="text"]:focus, input[type="number"]:focus{
+    outline: unset !important;
+    border: var(--border-size) var(--border-type) var(--light);
+
+}
+input[type="text"]{
+    background-color: #000;
+    border: var(--border-size) var(--border-type) var(--border-color);
+    color: var(--color);
+}
+input[type="number"]{
+    background-color: #000;
+    border: var(--border-size) var(--border-type) var(--border-color);
+    color: var(--color);
+}
+
+
+/*  */
 ::-webkit-scrollbar {
     height: 0px;
     width: 6px;
@@ -194,6 +212,8 @@
     position: relative;
     width: 100%;
     height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 .bar-time{
     position: relative;
@@ -400,4 +420,30 @@ input.input-mesh-option {
     outline: unset !important;
     border: var(--border-size) var(--border-type) var(--border-color);
     width: calc(30% - 20px);
+}
+.tit{
+    font-size: 1.2em;
+}
+.record-canvas {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-end;
+    opacity: .5;
+}
+.cs-btn.rec-item.start-record {
+    font-size: 2.2em;
+}
+.rec-item{
+    position: relative;
+    margin: 0px 10px 0px 10px;
+    padding: 0px 5px 0px 5px;
+}
+.current-record{
+    font-size: 2em;
+}
+#max-record{
+    padding: 5px;
+    
 }

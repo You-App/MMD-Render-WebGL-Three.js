@@ -51,7 +51,7 @@ var camera = [
     // 0
     {
         name: "Default",
-        src: "models/mmd/vmd/1/wavefile_camera.vmd"
+        src: "models/mmd/camera/1/wavefile_camera.vmd"
     },
     // 1
     {

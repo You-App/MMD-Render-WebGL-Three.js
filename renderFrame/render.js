@@ -68,7 +68,7 @@ function init() {
     renderer.setPixelRatio(1);
     // renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping; //
-    renderer.toneMappingExposure = file.models[model_select].toneMappingExposure; //
+    renderer.toneMappingExposure = 0.6; //
     container.appendChild(renderer.domElement);
     effect = new OutlineEffect(renderer);
     helper = new MMDAnimationHelper({ pmxAnimation: true });

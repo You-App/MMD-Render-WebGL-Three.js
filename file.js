@@ -38,7 +38,7 @@ var vmd = [
     // 0
     {
         name: "default",
-        src: "../models/mmd/vmd/1/wavefile_v2.vmd"
+        src: "../lib/mmd/vmd/1/wavefile_v2.vmd"
     },
     // 1
     {
@@ -51,7 +51,7 @@ var camera = [
     // 0
     {
         name: "Default",
-        src: "models/mmd/camera/1/wavefile_camera.vmd"
+        src: "../lib/mmd/camera/1/wavefile_camera.vmd"
     },
     // 1
     {

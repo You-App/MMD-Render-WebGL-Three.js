@@ -1,5 +1,6 @@
 # MMD-Render-WebGL-Three.js
-[beta] Render/ open .pmx | zip file use ThreeJs + JSZip
+[beta] Render/ open .pmx | zip file use ThreeJs + JSZip.
+To open pmx in zip: file -> Open zip (to model) or (to map) -> select file (use window.showOpenFilePicker)
 ![Demo-1](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/219db686-7c24-42db-b2ab-e126bad625bc)
 7680x2160 image 
 ![MMD renderer - 1716542995436](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/3139f90a-71ad-4ab0-b086-acc05507623f)

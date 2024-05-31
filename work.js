@@ -1,4 +1,3 @@
-// Code for fun, look like trash :/
 var render = document.querySelector(".render");
 var renderWindow = document.querySelector("#main-render");
 var fileList = document.querySelector("#setup-render");
@@ -29,6 +28,7 @@ var renderOption = {
     plus: "auto",
     ratio: "auto"
 }
+var record;
 leftTopSelect.addEventListener("click", (e) => {
     if (e.target.className == "option-lf") {
         let a = document.querySelector(e.target.dataset.for);
@@ -39,7 +39,7 @@ leftTopSelect.addEventListener("click", (e) => {
 });
 
 function loadFileList() {
-    modelFile = new FileControl(setUp, {file: window.file.models, style: true});
+    modelFile = new FileControl(setUp, {file: window.file.models, style: true, showPath: true});
     modelFile.create();
     modelFile.on("left", (url, e) => {
         selection.model.push({
@@ -123,6 +123,8 @@ loadbtn.addEventListener("click", ()=>{
             wd.loadAll(selection);
             meshView.innerHTML = "";
             _meshManager = new MeshManager(meshView, wd.scene);
+            record = new RecordVideo(renderFrame.renderer.domElement);
+            document.querySelector(".record-canvas").style.opacity = "1";
         }
     });
 });
@@ -452,6 +454,41 @@ document.querySelector(".file-drop-menu").addEventListener("click", async (e) =>
         }
     }
 });
+document.querySelector(".start-record").addEventListener("click", (e) => {
+    if (!record) return;
+    if (!record.recording) {
+        let type = document.querySelector("#record-type");
+        let fps = document.querySelector("#record-fps");
+        let max = document.querySelector("#max-record");
+        let current = document.querySelector(".current-record");
+        record.setType(type.value).setFps(fps.value * 1);
+        record.onRunning(() => {
+            current.innerText = timeToMin(secondsToTime(record.time));
+            if (record.time >= max.valueAsNumber) {
+                record.stop();
+                e.target.innerText = "Start";
+            }
+        });
+        let ex = type.value.indexOf("/mp4") !== -1 ? ".mp4" : ".webm";
+        record.onStop((data) => {
+            let u = URL.createObjectURL(data);
+            let a = document.createElement("a");
+            a.setAttribute("download", `mmd-rec-${Date.now()}${ex}`);
+            a.setAttribute("target", "_blank");
+            a.href = u;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        });
+        record.start();
+        e.target.innerText = "Stop";
+    } else {
+        record.stop();
+        e.target.innerText = "Start";
+    }
+});
+
+
 document.addEventListener("click", (e) => {
     if (e.target.classList[0] !== "top-select") {
         document.querySelector(".file-drop-menu").style.display = "";

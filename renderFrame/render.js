@@ -1,7 +1,11 @@
-import * as THREE from 'three';
-import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
-import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
-import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
+import * as THREE from '/bk/beta/animation/build/three.module.min.js';
+import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
+import { MMDLoader } from './jsm/loaders/MMDLoader.js';
+import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
+import { OrbitControls } from './jsm/controls/OrbitControls.js';
+import { Reflector } from './jsm/objects/Reflector.js';
+import * as file from './file.js';
+import { Move3d } from './move.module.js';
 
 window.cam3d = null;
 window.data_file = file;
@@ -14,6 +18,7 @@ window.helper = null;
 window.loader = null;
 window.dirLight = null;
 window.hemiLight = null;
+window.moveCam = null;
 window.TH = THREE;
 window.renderQuality = 1.0;
 window.renderOption = {
@@ -24,8 +29,11 @@ window.renderOption = {
 window.ready = false;
 window.clock = new THREE.Clock();
 var model_select = 0;
+var vmd_select = 0;
 window.cam_select = 0;
 var bg_select = 0;
+var ex; //32
+var comp = {load:0, all: 0}
 window.all_mesh = {};
 window.all_vmd = {};
 window.all_animation = {};
@@ -193,6 +201,9 @@ window.loadAll = (e) => {
     function loadcam(){
         if(selection.camera.length < 1){
             loadVmd();
+            moveCam = new OrbitControls(camera, renderer.domElement);
+            moveCam.minDistance = 10;
+            moveCam.maxDistance = 100;
             return;
         }
         let url = selection.camera;
@@ -267,6 +278,7 @@ window.loadAll = (e) => {
     }
 
 }
+
 window.onWindowResize = () => {
     var outValue = {
         width : window.innerWidth,
@@ -308,13 +320,9 @@ window.onWindowResize = () => {
             }
         }
     }
-    if (cam3d) {
-        cam3d.camera.aspect = window.innerWidth / window.innerHeight;
-        cam3d.camera.updateProjectionMatrix();
-    } else {
-        camera.aspect = outValue.width / outValue.height;
-        camera.updateProjectionMatrix();
-    }
+    camera.aspect = outValue.width / outValue.height;
+    camera.updateProjectionMatrix();
+
     effect.setSize(outValue.width, outValue.height);
 }
 
@@ -331,16 +339,13 @@ function render() {
         if(MorInfo){
             MorInfo.update(mesh);
         }
-    } else{
+    } else {
         return;
     }
-    if(cam3d){
-        effect.render(scene, cam3d.camera);
-        cam3d.update(t);
-    } else{
-        effect.render(scene, camera);
-    }
-    if(bg_select == 1){
-        window.water.material.uniforms[ 'time' ].value += (1 + (50 * t)) / 60.0;
+    effect.render(scene, camera);
+
+    if (bg_select == 1) {
+        window.water.material.uniforms['time'].value += (1 + (50 * t)) / 60.0;
     }
 }
+

@@ -677,10 +677,10 @@ class RecordVideo{
         var vid = this.stream.getVideoTracks();
         var aud = this.stream.getAudioTracks();
         if(vid[0]){
-            this.stream.removeTrack(vid);
+            this.stream.removeTrack(vid[0]);
         }
         if(aud[0]){
-            this.stream.removeTrack(aud);
+            this.stream.removeTrack(aud[0]);
         }
     }
     onStop(callback){

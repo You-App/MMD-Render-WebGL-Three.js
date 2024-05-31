@@ -1,11 +1,10 @@
-import * as THREE from '/bk/beta/animation/build/three.module.min.js';
-import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
-import { MMDLoader } from './jsm/loaders/MMDLoader.js';
-import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
-import { OrbitControls } from './jsm/controls/OrbitControls.js';
-import { Reflector } from './jsm/objects/Reflector.js';
+import * as THREE from 'three';
+import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
+import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
+import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Reflector } from 'three/addons/objects/Reflector.js';
 import * as file from './file.js';
-import { Move3d } from './move.module.js';
 
 window.cam3d = null;
 window.data_file = file;

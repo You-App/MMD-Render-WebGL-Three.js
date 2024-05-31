@@ -151,6 +151,13 @@ input[type="number"]{
     width: 100%;
     height: 100%;
 }
+div#load-all {
+    position: relative;
+    max-width: 50%;
+    font-size: 1.4em;
+    text-align: center;
+    margin-top: 5px;
+}
 .top-selection {
     position: relative;
     width: 100%;

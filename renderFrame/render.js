@@ -332,9 +332,5 @@ function render() {
         return;
     }
     effect.render(scene, camera);
-
-    if (bg_select == 1) {
-        window.water.material.uniforms['time'].value += (1 + (50 * t)) / 60.0;
-    }
 }
 

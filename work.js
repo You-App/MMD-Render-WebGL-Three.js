@@ -393,7 +393,7 @@ document.querySelector(".file-drop-menu").addEventListener("click", async (e) =>
             if (window.showOpenFilePicker) {
                 file = await getHanderFile();
                 if(file.type == "application/zip"){
-                    let allFile = await readZip2(file, true);
+                    let allFile = await readZip(file, true);
                     let key = file.name + Date.now();
                     addFileMap[key] = allFile;
                     for (let i = 0; i < allFile.length; i++) {

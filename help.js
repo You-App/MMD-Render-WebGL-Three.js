@@ -1,4 +1,5 @@
-
+// Support to work.js
+// no idea
 class FileControl{
     /**
      * 
@@ -6,6 +7,7 @@ class FileControl{
      * @param {Object} params option
      * @param {Array} params.file files list
      * @param {Boolean} params.style add css
+     * @param {Boolean | undefined} params.showPath show pathName file
      */
     constructor(conatiner, params = {}){
         this.params = params;
@@ -26,9 +28,11 @@ class FileControl{
             for (let k = 0; k < src.length; k++) {
                 const s = src[k];
                 if(k === 0){
+                    var path = "";
+                    if(this.params.showPath === true && e.pathName) path = e.pathName;
                     fileList += `
                     <div class="mmd-item" style="--s: ${this.count}">
-                        <div class="mmd-item-name">${e.name}</div>
+                        <div class="mmd-item-name">${path} - ${e.name}</div>
                         <div class="mmd-item-stat">unload</div>
                         <div class="mi-ovl" data-src="${s}"></div>
                     </div>
@@ -264,6 +268,13 @@ class InfoMor{
     }
 }
 class MeshManager{
+    /**
+     * 
+     * @param {HTMLElement} conatiner container
+     * @param {Object3D} scene scene three.js
+     * @param {Object} params option
+     * @returns {undefined} when no container
+     */
     constructor(conatiner, scene, params = {}){
         if(!conatiner) return;
         this.conatiner = conatiner;
@@ -300,6 +311,10 @@ class MeshManager{
         this.target = box;
         this._addEvent();
     }
+    /**
+     * 
+     * @param {Object3D} scene scene
+     */
     update(scene){
         var filter = [];
         let list = this._getEleArr(".mesh-select > .mesh-item");
@@ -570,41 +585,8 @@ class MeshManager{
  * @param {Boolean} url Is auto create object url
  * @returns {Array} name, file, url
  */
-function readZip(zip, url){
-    var u = URL.createObjectURL(zip);
-    return new Promise((resolve, reject) => {
-        JSZipUtils.getBinaryContent(u, function(err, data) {
-            if(err) {
-                throw err; // or handle err
-            }
-        
-            JSZip.loadAsync(data, { encoding: 'Shift-JIS' }).then(async function (e) {
-               if(e){
-                e.files
-                var arr = [];
-                for (const k in e.files) {
-                    if(e.files[k]){
-                        var f = await e.files[k].async("blob");
-                        var p = "none";
-                        if(url){p = URL.createObjectURL(f)}
-                        arr.push({
-                            name: k,
-                            file: f,
-                            url: p
-                        });
-                    }
-                }
-                resolve(arr);
-               } else{
-                reject("unknow");
-               }
-            });
-        });
-    });
-}
 var loader;
-var loggg = []
-function readZip2(zip, url) {
+function readZip(zip, url) {
     if (!loader) {
         loader = new ThreeLoader();
     }
@@ -617,7 +599,6 @@ function readZip2(zip, url) {
                 decodeFileName: function (bytes) {
                     var decoder = new TextDecoder('Shift_JIS');
                     var decodedString = decoder.decode(bytes);
-                    loggg.push(bytes);
                     return decodedString;
                 }
             }).then(async function (e) {
@@ -643,4 +624,101 @@ function readZip2(zip, url) {
             });
         });
     });
+}
+
+class RecordVideo{
+    /**
+     * 
+     * @param {HTMLCanvasElement} canvas canvas
+     * @param {String} type type video: video/mp4 | video/webm;codecs=daala | video/webm;codecs=h264 | video/webm;codecs=vp8 | video/webm
+     * @param {Number} fps fps video 
+     * @returns 
+     */
+    constructor(canvas, type = "video/webm;codecs=h264", fps = 20){
+        if (!canvas) return;
+        this.canvas = canvas;
+        this.fps = fps;
+        this.recording = false;
+        this.record = [];
+        this.time = 0;
+        this.totalTime = 0;
+        this.setType(type);
+    }
+    start(){
+        if(this.recording) return;
+        this.stream = this.canvas.captureStream(this.fps);
+        this.recorder = new MediaRecorder(this.stream, {
+            mimeType: this.type
+        });
+          //bruh
+        let that = this;
+        this.recorder.ondataavailable = (e) => {
+            if(e.data.size) {
+                that.record.push(e.data);
+                if(that.callback){
+                    that.callback(e.data);
+                }
+            };
+        }
+        this.recorder.start();
+        this.interval = setInterval(() => {
+            that.time++;
+            if(that.updateRuning) that.updateRuning();
+        }, 1000);
+        this.recording = true;
+    }
+    stop(){
+        if(!this.recording) return;
+        this.recorder.stop();
+        this.totalTime = this.time;
+        clearInterval(this.interval);
+        this.time = 0;
+        this.recording = false;
+        var vid = this.stream.getVideoTracks();
+        var aud = this.stream.getAudioTracks();
+        if(vid[0]){
+            this.stream.removeTrack(vid);
+        }
+        if(aud[0]){
+            this.stream.removeTrack(aud);
+        }
+    }
+    onStop(callback){
+        if(typeof callback == "function") this.callback = callback;
+    }
+    onRunning(callback){
+        if(typeof callback == "function") this.updateRuning = callback;
+
+    }
+    setFps(fps){
+        if(!fps) return;
+        this.fps = fps;
+        return this;
+    }
+    setType(type){
+        if(type){
+            let sup = MediaRecorder.isTypeSupported(type);
+            if(sup){
+                this.type = type;
+                return this;
+            }
+        }
+        console.warn(`"${type}" not support`);
+        let types = [
+            "video/mp4",
+            "video/webm;codecs=daala",
+            "video/webm;codecs=h264",
+            "video/webm;codecs=vp8",
+            "video/webm",
+        ];
+        for (let i = 0; i < types.length; i++) {
+            const e = types[i];
+            let sup = MediaRecorder.isTypeSupported(type);
+            if(sup){
+                this.type = e;
+                console.warn(`| Swich to ${e}`);
+                return this;
+            }
+        }
+    }
 }

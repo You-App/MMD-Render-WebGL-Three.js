@@ -48,9 +48,6 @@ function init() {
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
     // scene
     scene = new THREE.Scene();
-    scene.background = new THREE.TextureLoader().load("/img/blank.png");
-    scene.background.wrapS = THREE.RepeatWrapping;
-    scene.background.wrapT = THREE.RepeatWrapping;
     //______Test
     // img("/img/sc1.png", {position: [0, 25, -60], scale: [20, 20, 0.1]});
     //______
@@ -63,7 +60,7 @@ function init() {
     dirLight = new THREE.DirectionalLight(0xffffff);
     dirLight.position.set(75, 300, -75);
     scene.add(dirLight);
-    window.directionalLight = new THREE.DirectionalLight(file.models[model_select].color, 1);
+    window.directionalLight = new THREE.DirectionalLight(0xdddddd, 1);
     directionalLight.position.set(- 1, 1, 1).normalize();
     scene.add(directionalLight);
     renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});

@@ -4,8 +4,9 @@ import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
 import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Reflector } from 'three/addons/objects/Reflector.js';
-import * as file from './file.js';
+import * as file from '../file.js';
 
+//most is useless and trash but update later(or not)
 window.cam3d = null;
 window.data_file = file;
 window.scene = null;
@@ -27,12 +28,6 @@ window.renderOption = {
 }
 window.ready = false;
 window.clock = new THREE.Clock();
-var model_select = 0;
-var vmd_select = 0;
-window.cam_select = 0;
-var bg_select = 0;
-var ex; //32
-var comp = {load:0, all: 0}
 window.all_mesh = {};
 window.all_vmd = {};
 window.all_animation = {};

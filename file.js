@@ -1,21 +1,37 @@
+// file url
 var models = [
     // 0
     {
         name: "Furina P",
         pathName: "Genshin",
-        src: "/src/mmd/model/gi/furina/1.pmx",
+        src: "/lib/mmd/model/furina/1.pmx",
         color: 0xdddddd,
-        toneMappingExposure: 0.5,
+        toneMappingExposure: 0.55,
         extension: [
-            "/src/mmd/model/gi/furina/3.pmx", "/src/mmd/model/gi/furina/4.pmx",
-            "/src/mmd/model/gi/furina/5.pmx", "/src/mmd/model/gi/furina/6.pmx",
-            "/src/mmd/model/gi/furina/7.pmx", "/src/mmd/model/gi/furina/8.pmx",
-            "/src/mmd/model/gi/furina/9.pmx", "/src/mmd/model/gi/furina/10.pmx",
-            "/src/mmd/model/gi/furina/11.pmx", "/src/mmd/model/gi/furina/12.pmx",
-            "/src/mmd/model/gi/furina/13.pmx",
+            "/lib/mmd/model/furina/3.pmx", "/lib/mmd/model/furina/4.pmx",
+            "/lib/mmd/model/furina/5.pmx", "/lib/mmd/model/furina/6.pmx",
+            "/lib/mmd/model/furina/7.pmx", "/lib/mmd/model/furina/8.pmx",
+            "/lib/mmd/model/furina/9.pmx", "/lib/mmd/model/furina/10.pmx",
+            "/lib/mmd/model/furina/11.pmx", "/lib/mmd/model/furina/12.pmx",
+            "/lib/mmd/model/furina/13.pmx",
         ]
     },
-
+    {
+        name: "Furina O",
+        pathName: "Genshin",
+        src: "/lib/mmd/model/furina/2.pmx",
+        color: 0xdddddd,
+        toneMappingExposure: 0.55,
+        extension: []
+    },
+    {
+        name: "Hutao",
+        pathName: "Genshin",
+        src: "/lib/mmd/model/hutao/1.pmx",
+        color: 0xdddddd,
+        toneMappingExposure: 0.55,
+        extension: []
+    },
 ];
 
 var vmd = [
@@ -27,7 +43,7 @@ var vmd = [
     // 1
     {
         name: "おねがいダーリン",
-        src: "/src/mmd/wavefile/p1/2.vmd"
+        src: "/lib/mmd/vmd/neko.vmd"
     },
 ];
 
@@ -40,24 +56,19 @@ var camera = [
     // 1
     {
         name: "Drama",
-        src: "/src/mmd/cam/drama.vmd"
+        src: "/lib/mmd/camera/neko.vmd"
     },
 ];
 var _bg = [
     {
         name: "[N]夜月蓝·H2CU式stage13",
         isPmx: true,
-        src: ["/src/mmd/bg/2/1.pmx"]
-    },
-    {
-        name: "[N]虫无阶梯·H2CU式stage10-1",
-        isPmx: true,
-        src: ["/src/mmd/bg/3/1.pmx"]
+        src: ["/lib/mmd/map/1.pmx"]
     },
     {
         name: "わた雲の空",
         isPmx: true,
-        src: ["/src/mmd/bg/12/1.pmx"],
+        src: ["/lib/mmd/map/1.pmx"],
     },
 ];
 

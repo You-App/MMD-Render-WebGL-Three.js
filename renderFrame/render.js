@@ -3,7 +3,6 @@ import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
 import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
 import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Reflector } from 'three/addons/objects/Reflector.js';
 import * as file from '../file.js';
 
 //most is useless and trash but update later(or not)
@@ -34,7 +33,6 @@ window.all_animation = {};
 window.all_map = {};
 window.all_cam = null;
 var MorInfo;
-window.ref = Reflector;
 
 Ammo().then(function () {
     init();

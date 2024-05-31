@@ -38,12 +38,12 @@ var vmd = [
     // 0
     {
         name: "default",
-        src: "models/mmd/vmds/wavefile_v2.vmd"
+        src: "models/mmd/vmd/1/wavefile_v2.vmd"
     },
     // 1
     {
         name: "ねこみみ。。。",
-        src: "../lib/mmd/vmd/neko.vmd"
+        src: "../lib/mmd/vmd/2/neko.vmd"
     },
 ];
 
@@ -51,24 +51,24 @@ var camera = [
     // 0
     {
         name: "Default",
-        src: "models/mmd/vmds/wavefile_camera.vmd"
+        src: "models/mmd/vmd/1/wavefile_camera.vmd"
     },
     // 1
     {
         name: "ねこみみ。。。",
-        src: "../lib/mmd/camera/neko.vmd"
+        src: "../lib/mmd/camera/2/neko.vmd"
     },
 ];
 var _bg = [
     {
         name: "[N]夜月蓝·H2CU式stage13",
         isPmx: true,
-        src: ["../lib/mmd/map/1.pmx"]
+        src: ["../lib/mmd/map/1/1.pmx"]
     },
     {
         name: "わた雲の空",
         isPmx: true,
-        src: ["../lib/mmd/map/1.pmx"],
+        src: ["../lib/mmd/map/2/1.pmx"],
     },
 ];
 

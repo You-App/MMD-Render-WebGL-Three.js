@@ -32,6 +32,14 @@ var models = [
         toneMappingExposure: 0.55,
         extension: []
     },
+    {
+        name: "Chiori",
+        pathName: "Genshin",
+        src: "../lib/mmd/models/chiori/chiori.pmx",
+        color: 0xdddddd,
+        toneMappingExposure: 0.55,
+        extension: []
+    },
 ];
 
 var vmd = [

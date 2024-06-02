@@ -6,3 +6,5 @@ To open pmx in zip: file -> Open zip (to model) or (to map) -> select file (use 
 ![MMD renderer - 1716542995436](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/3139f90a-71ad-4ab0-b086-acc05507623f)
 Multi object
 ![MMD renderer - 1716638772678](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/bb96b4a8-598d-47a3-a750-e45738c3b85e)
+Try to add bloom (fail)
+![MMD renderer - 1717334851694](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/dda6e43e-53d5-4c90-b624-294dfa1a977d)

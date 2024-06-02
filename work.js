@@ -29,14 +29,14 @@ var renderOption = {
     ratio: "auto"
 }
 var record;
-leftTopSelect.addEventListener("click", (e) => {
-    if (e.target.className == "option-lf") {
-        let a = document.querySelector(e.target.dataset.for);
-        if (a) {
-            a.style.display == "block" ? a.style.display = "" : a.style.display = "block";
-        }
-    }
-});
+// leftTopSelect.addEventListener("click", (e) => {
+//     if (e.target.className == "option-lf") {
+//         let a = document.querySelector(e.target.dataset.for);
+//         if (a) {
+//             a.style.display == "block" ? a.style.display = "" : a.style.display = "block";
+//         }
+//     }
+// });
 
 function loadFileList() {
     modelFile = new FileControl(setUp, {file: window.file.models, style: true, showPath: true});
@@ -254,7 +254,7 @@ document.querySelector(".left-menu > .lf-container").addEventListener("click", (
 function barSwich(e, element){
     var {target} = e;
     var clas = target.classList;
-    if(clas[0] == "option-rt"){
+    if(clas[0] == "option-rt" || clas[0] == "option-lf"){
         let cont = target.dataset.for;
         let show = element.querySelector(".-option-show-");
         if(show){ show.classList.remove("-option-show-") }
@@ -366,90 +366,80 @@ document.querySelector(".top-bar-list").addEventListener("click", async (e) => {
     }
 });
 document.querySelector(".file-drop-menu").addEventListener("click", async (e) => {
-    var {target} = e;
+    var { target } = e;
     if (target.classList[0] == "item-box-menu") {
         if (target.classList[1] == "open-zip-mode") {
-            if (window.showOpenFilePicker) {
-                file = await getHanderFile();
-                if(file.type == "application/zip"){
-                    let allFile = await readZip(file, true);
-                    let key = file.name + Date.now();
-                    addFile[key] = allFile;
-                    for (let i = 0; i < allFile.length; i++) {
-                        const e = allFile[i];
-                        if(e.name.endsWith(".pmx")){
-                            modelFile.addObject({
-                                name: e.name,
-                                url: e.url,
-                                position: key
-                            });
-                        }
+            file = await getHanderFile();
+            if (file.type == "application/zip") {
+                let allFile = await readZip(file, true);
+                let key = file.name + Date.now();
+                addFile[key] = allFile;
+                for (let i = 0; i < allFile.length; i++) {
+                    const e = allFile[i];
+                    if (e.name.endsWith(".pmx")) {
+                        modelFile.addObject({
+                            name: e.name,
+                            url: e.url,
+                            position: key
+                        });
                     }
-                    
                 }
+
             }
         }
         if (target.classList[1] == "open-zip-mode-map") {
-            if (window.showOpenFilePicker) {
-                file = await getHanderFile();
-                if(file.type == "application/zip"){
-                    let allFile = await readZip(file, true);
-                    let key = file.name + Date.now();
-                    addFileMap[key] = allFile;
-                    for (let i = 0; i < allFile.length; i++) {
-                        const e = allFile[i];
-                        if(e.name.endsWith(".pmx")){
-                            mapFile.addObject({
-                                name: e.name,
-                                url: e.url,
-                                position: key
-                            });
-                        }
+            file = await getHanderFile();
+            if (file.type == "application/zip") {
+                let allFile = await readZip2(file, true);
+                let key = file.name + Date.now();
+                addFileMap[key] = allFile;
+                for (let i = 0; i < allFile.length; i++) {
+                    const e = allFile[i];
+                    if (e.name.endsWith(".pmx")) {
+                        mapFile.addObject({
+                            name: e.name,
+                            url: e.url,
+                            position: key
+                        });
                     }
-                    
                 }
+
             }
         }
         if (target.classList[1] == "open-zip-mode-vmd") {
-            if (window.showOpenFilePicker) {
-                file = await getHanderFile();
-                if(file.type == "application/zip"){
-                    let allFile = await readZip2(file, true);
-                    let key = file.name + Date.now();
-                    addFileVmd[key] = allFile;
-                    for (let i = 0; i < allFile.length; i++) {
-                        const e = allFile[i];
-                        if(e.name.endsWith(".vmd")){
-                            vmdFile.addObject({
-                                name: e.name,
-                                url: e.url,
-                            });
-                        }
+            file = await getHanderFile();
+            if (file.type == "application/zip") {
+                let allFile = await readZip2(file, true);
+                let key = file.name + Date.now();
+                addFileVmd[key] = allFile;
+                for (let i = 0; i < allFile.length; i++) {
+                    const e = allFile[i];
+                    if (e.name.endsWith(".vmd")) {
+                        vmdFile.addObject({
+                            name: e.name,
+                            url: e.url,
+                        });
                     }
-                    
                 }
+
             }
         }
         if (target.classList[1] == "open-zip-mode-file-cam") {
-            if (window.showOpenFilePicker) {
-                file = await getHanderFile();
-                if (file.name.endsWith(".vmd")) {
-                    cameraFile.addObject({
-                        name: file.name,
-                        url: URL.createObjectURL(file),
-                    });
-                }
+            file = await getHanderFile();
+            if (file.name.endsWith(".vmd")) {
+                cameraFile.addObject({
+                    name: file.name,
+                    url: URL.createObjectURL(file),
+                });
             }
         }
         if (target.classList[1] == "open-zip-mode-file-mot") {
-            if (window.showOpenFilePicker) {
-                file = await getHanderFile();
-                if (file.name.endsWith(".vmd")) {
-                    vmdFile.addObject({
-                        name: file.name,
-                        url: URL.createObjectURL(file)
-                    });
-                }
+            file = await getHanderFile();
+            if (file.name.endsWith(".vmd")) {
+                vmdFile.addObject({
+                    name: file.name,
+                    url: URL.createObjectURL(file)
+                });
             }
         }
     }
@@ -494,11 +484,24 @@ document.addEventListener("click", (e) => {
         document.querySelector(".file-drop-menu").style.display = "";
     }
 });
-function getHanderFile(){
+function getHanderFile() {
     return new Promise(async (resolve, reject) => {
-        let files = await window.showOpenFilePicker({multiple: false});
-        let file = await files[0].getFile();
-        resolve(file);
+        if (window.showOpenFilePicker) {
+            let files = await window.showOpenFilePicker({ multiple: false });
+            let file = await files[0].getFile();
+            resolve(file);
+        } else{
+            let input = document.querySelector("#__input_file");
+            if(!input){
+                input = document.createElement("input");
+                input.type = "file";
+                input.id = "__input_file";
+            }
+            input.click();
+            input.onchange = () =>{
+                resolve(input.files[0]);
+            }
+        }
     });
 }
 function downloadBlob(file, name) {

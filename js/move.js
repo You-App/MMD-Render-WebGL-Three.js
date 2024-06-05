@@ -1,5 +1,5 @@
-import {Vector3} from '/bk/beta/animation/build/three.module.min.js';
-import { Capsule } from '../../jsm/math/Capsule.js';
+import {Vector3} from 'three';
+import { Capsule } from 'three/addons/math/Capsule.js';
 
 class Move3d {
     constructor(camera, option = {}) {

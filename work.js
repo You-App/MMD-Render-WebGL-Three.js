@@ -524,3 +524,16 @@ function getBone(key, bone){
     }
 }
 }
+// No reload page in mobile
+document.addEventListener("touchmove", (e) => {
+    if(e.cancelable){
+        e.preventDefault();
+    }
+}, {passive: false});
+// Hide contextmenu when no hold ctrl
+document.addEventListener("contextmenu", (e) => {
+    if(!e.ctrlKey){
+        e.preventDefault();
+    }
+
+}, {passive: false});

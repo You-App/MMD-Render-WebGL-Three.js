@@ -6,7 +6,7 @@
     --bottom-bar: 25px;
     --left-menu: 25%;
     --right-menu: 20%;
-    --border-size: 1px;
+    --border-size: 2px;
     --border-color: #ddd;
     --border-type: solid;
     --cursor-def: url("");
@@ -31,6 +31,9 @@
     user-select: none;
     cursor: var(--cursor-poi), pointer;
     outline: none !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: center;
 }
 .cs-btn:hover{
     border: var(--border-size) var(--border-type) var(--light);
@@ -54,14 +57,12 @@ input[type="number"]{
     border: var(--border-size) var(--border-type) var(--border-color);
     color: var(--color);
 }
-.mmd-item-stat {
-    display: none;
-}
+
 
 /*  */
 ::-webkit-scrollbar {
     height: 0px;
-    width: 6px;
+    width: 7px;
 }
 ::-webkit-scrollbar-track {
     background: #434343;
@@ -89,7 +90,6 @@ input[type="number"]{
     background-color: var(--background);
     color: var(--color);
     cursor: var(--cursor-def), auto;
-    user-select: none;
 }
 .inner{
     position: absolute;
@@ -129,8 +129,9 @@ input[type="number"]{
 }
 .item-box-menu{
     position: relative;
-    font-size: 1.1em;
+    font-size: 1.5em;
     margin: 2px;
+    padding: 5px 0px 5px 0px;
     cursor: var(--cursor-poi), pointer;
 }
 .item-box-menu:hover{
@@ -170,6 +171,8 @@ div#load-all {
     justify-content: flex-start;
     align-items: center;
     border-bottom: var(--border-size) var(--border-type) var(--border-color);
+    overflow-x: scroll;
+    overflow-y: hidden;
 }
 .option-lf, .option-rt {
     font-size: 2em;
@@ -181,6 +184,7 @@ div#load-all {
     border-bottom: none;
     margin-left: 5px;
     margin-right: 5px;
+    white-space: nowrap;
 }
 .option-lf:hover, .option-rt:hover {
     color: var(--light);
@@ -209,13 +213,13 @@ div#load-all {
 .render-contaner {
     position: relative;
     width: 100%;
-    height: 80%;
+    height: 75%;
     overflow: hidden;
 }
 .bottom-tool {
     position: relative;
     width: 100%;
-    height: 20%;
+    height: 25%;
     border-top: var(--border-size) var(--border-type) var(--border-color);
 }
 .time-panel {
@@ -235,7 +239,7 @@ div#load-all {
 }
 .bar-time-current, .bar-time-duration{
     position: relative;
-    font-size: 1.5em;
+    font-size: 1.8em;
 }
 .bar-progress{
     position: relative;
@@ -256,8 +260,7 @@ div#load-all {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    height: 40px;
-    margin: 2px 0px 2px 0px;
+    height: 45px;
 }
 .sec-control, .pri-control {
     width: 49%;
@@ -443,18 +446,47 @@ input.input-mesh-option {
     align-items: flex-end;
     opacity: .5;
 }
-.cs-btn.rec-item.start-record {
+.cs-btn.start-record {
     font-size: 2.2em;
 }
-.rec-item{
+.rec-item > * {
     position: relative;
-    margin: 0px 10px 0px 10px;
-    padding: 0px 5px 0px 5px;
+    max-width: 100%;
 }
+.rec-item {
+    position: relative;
+    width: 20%;
+}
+
 .current-record{
     font-size: 2em;
 }
 #max-record{
     padding: 5px;
     
+}
+.log-content{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.log-message{
+    white-space: nowrap;
+    padding: 6px;
+    font-size: 1.1em;
+}
+.log-info{
+    color: #ffffff;
+}
+.log-ok{
+    color: #00f200;
+    background-color: #00f20035;
+}
+.log-warn{
+    color: #e6e600;
+    background-color: #e6e60035;
+}
+.log-error{
+    color: #ff0000;
+    background-color: #ff000035;
 }

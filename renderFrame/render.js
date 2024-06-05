@@ -339,10 +339,9 @@ function render() {
 //
 
 window.addEventListener('beforeunload', (e) => {
-    if (_setting.b4unload && !_commandData.reloadPage) {
-        e.preventDefault()
-        return (e.returnValue = 'Are you sure you want to close?');
-    }
+    e.preventDefault()
+    return (e.returnValue = 'Are you sure you want to close?');
+
 });
 // Hide contextmenu when no hold ctrl
 document.addEventListener("contextmenu", (e) => {

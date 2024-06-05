@@ -1,7 +1,6 @@
 // file url
 // maybe it can write as json...
 var models = [
-    // 0
     {
         name: "Furina P",
         pathName: "Genshin",
@@ -44,25 +43,25 @@ var models = [
 ];
 
 var vmd = [
-    // 0
     {
         name: "default",
         src: "../lib/mmd/vmd/1/wavefile_v2.vmd"
     },
-    // 1
     {
         name: "ねこみみ。。。",
         src: "../lib/mmd/vmd/2/neko.vmd"
     },
+    {
+        name: "Toothless dance",
+        src: "../lib/mmd/vmd/3/tld.vmd"
+    },
 ];
 
 var camera = [
-    // 0
     {
         name: "Default",
         src: "../lib/mmd/camera/1/wavefile_camera.vmd"
     },
-    // 1
     {
         name: "ねこみみ。。。",
         src: "../lib/mmd/camera/2/neko.vmd"
@@ -70,7 +69,7 @@ var camera = [
 ];
 var _bg = [
     {
-        name: "[N]夜月蓝·H2CU式stage13",
+        name: "夜月蓝·H2CU式stage13",
         isPmx: true,
         src: ["../lib/mmd/map/1/1.pmx"]
     },

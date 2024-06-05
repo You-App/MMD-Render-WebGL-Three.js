@@ -240,7 +240,7 @@ window.loadAll = (e) => {
             window.top.log("ok", `| Complete (camera): ${url}`);
             all_cam = cameraAnimation;
             loadVmd()
-        });
+        }, (e) => {loading(e, "camera")});
     }
     function loadVmd(){
         if(selection.vmd.length < 1){

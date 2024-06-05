@@ -1,4 +1,4 @@
-import * as s1 from './file.js';
+import * as s1 from './js/file.js';
 import {FileLoader} from 'three';
 
 // golal

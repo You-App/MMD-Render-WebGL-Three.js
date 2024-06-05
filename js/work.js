@@ -383,7 +383,7 @@ function log(type, message){
     target.appendChild(e);
     target.parentElement.scrollBy(0, 9999);
     let all = document.querySelectorAll(".log-content > .log-message");
-    if(all.length > 99) all[0].remove();
+    if(all.length > 199) all[0].remove();
 }
 
 

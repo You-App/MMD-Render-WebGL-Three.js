@@ -525,10 +525,9 @@ function getBone(key, bone){
 }
 }
 window.addEventListener('beforeunload', (e) => {
-    if (_setting.b4unload && !_commandData.reloadPage) {
-        e.preventDefault()
-        return (e.returnValue = 'Are you sure you want to close?');
-    }
+    e.preventDefault()
+    return (e.returnValue = 'Are you sure you want to close?');
+
 });
 // No reload page in mobile
 // document.addEventListener("touchmove", (e) => {

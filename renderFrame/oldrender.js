@@ -3,14 +3,11 @@ import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
 import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
 import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Move3d } from './mmdManager/js/move.module.js';
+import * as file from '../file.js';
 
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-
+//most is useless and trash but update later(or not)
 window.cam3d = null;
+window.data_file = file;
 window.scene = null;
 window.renderer  = null;
 window.effect = null;
@@ -22,16 +19,6 @@ window.dirLight = null;
 window.hemiLight = null;
 window.moveCam = null;
 window.TH = THREE;
-window.composer = null;
-window.renderScene = null;
-window.bloomPass = null;
-window.outputPass = null;
-window.bloom = {
-    threshold: 0.8,
-    strength: 0.4,
-    radius: 1,
-    exposure: 1
-};
 window.renderQuality = 1.0;
 window.renderOption = {
     quality: "auto",
@@ -45,7 +32,8 @@ window.all_vmd = {};
 window.all_animation = {};
 window.all_map = {};
 window.all_cam = null;
-var cmt = "====================";
+var MorInfo;
+
 Ammo().then(function () {
     init();
     render();
@@ -60,9 +48,6 @@ function init() {
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
     // scene
     scene = new THREE.Scene();
-
-    
-
     //______Test
     // img("/img/sc1.png", {position: [0, 25, -60], scale: [20, 20, 0.1]});
     //______
@@ -83,25 +68,9 @@ function init() {
     renderer.setPixelRatio(1);
     // renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping; //
-    renderer.toneMappingExposure = 0.65; //
+    renderer.toneMappingExposure = 0.6; //
     container.appendChild(renderer.domElement);
-
-    renderScene = new RenderPass( scene, camera );
-
-    bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-    bloomPass.threshold = bloom.threshold;
-    bloomPass.strength = bloom.strength;
-    bloomPass.radius = bloom.radius;
-
-    outputPass = new OutputPass();
-
-    composer = new EffectComposer(renderer);
-    composer.addPass(renderScene);
-    composer.addPass(bloomPass);
-    composer.addPass( outputPass );
-
-
-    // effect = new OutlineEffect(renderer);
+    effect = new OutlineEffect(renderer);
     helper = new MMDAnimationHelper({ pmxAnimation: true });
     loader = new MMDLoader();
     onWindowResize();
@@ -127,7 +96,8 @@ function init() {
         window.top.res();
     }
 }
-
+//currentTimeAnimation
+//helper.objects.get(all_mesh['/src/mmd/model/blue_archive/mari_2/1.pmx']).mixer._actions[0].time
 
 window.removeMesh = (url) => {
     if (all_mesh[url]) {
@@ -143,6 +113,7 @@ window.removeMap = (url) => {
         scene.remove(all_map[url]);
     }
 }
+
 window.addMesh = (url, data) => {
     if(!ready) return;
     if (all_mesh[url]) {
@@ -151,7 +122,6 @@ window.addMesh = (url, data) => {
             animation: all_animation[url],
             physics: true
         });
-        window.top.anyChange();
     } else{
         let position = data.dataset.pos;
         let name = data.previousElementSibling.previousElementSibling.innerText;
@@ -160,22 +130,19 @@ window.addMesh = (url, data) => {
             CUSTOM = window.top.addFile[position];
         }
         loader.load(url, (m) => {
-            window.top.log("ok", `| Complete (model): ${url}`);
             m.name = name;
             all_mesh[url] = m;
             loader.loadAnimation(window.top.selection.vmd, m, (mmd) => {
-                window.top.log("ok", `| Complete (animation): ${window.top.selection.vmd}`);
                 all_animation[url] = mmd;
                 setTimeout(() => {
                     scene.add(m);
-                    window.top.anyChange();
                     helper.add(m, {
                         animation: mmd,
                         physics: true
                     });
                 }, 200);
             });
-        }, (e) => {loading(e, "model")}, undefined, CUSTOM);
+        }, undefined, undefined, CUSTOM);
     }
 }
 window.addMap = (url, name) => {
@@ -189,16 +156,13 @@ window.addMap = (url, name) => {
             CUSTOM = window.top.addFileMap[position];
         }
         loader.load(url, function (e) {
-            window.top.log("ok", `| Complete (map): ${url}`);
             e.name = name.previousElementSibling.previousElementSibling.innerText;
             all_map[url] = e;
             scene.add(e);
             window.top.anyChange();
-        }, (e) => {loading(e, "map/object")}, undefined, CUSTOM);
+        }, undefined, undefined, CUSTOM);
     }
 }
-
-
 window.loadAll = (e) => {
     if(ready) return;
     var selection = e;
@@ -216,28 +180,23 @@ window.loadAll = (e) => {
             index++;
             m.name = name;
             all_mesh[url] = m;
-            window.top.log("ok", `| Complete (model): ${url}`);
             if(index < selection.model.length) {
                 loadModel();
             } else{
                 loadcam();
             }
-        }, (e) => {loading(e, "model")}, undefined, CUSTOM);
+        }, undefined, undefined, CUSTOM);
     }
     function loadcam(){
         if(selection.camera.length < 1){
             loadVmd();
-            if (window.top.isMobile) {
-                moveCam = new OrbitControls(camera, renderer.domElement);
-
-            } else {
-                moveCam = new Move3d(camera, { speed: 50, fly: 0.55, position: [0, 9, 25] });
-            }
+            moveCam = new OrbitControls(camera, renderer.domElement);
+            moveCam.minDistance = 10;
+            moveCam.maxDistance = 100;
             return;
         }
         let url = selection.camera;
         loader.loadAnimation(url, camera, (cameraAnimation) => {
-            window.top.log("ok", `| Complete (camera): ${url}`);
             all_cam = cameraAnimation;
             loadVmd()
         });
@@ -250,7 +209,6 @@ window.loadAll = (e) => {
         var key = Object.keys(all_mesh);
         var m = all_mesh[key[index_cam]];
         loader.loadAnimation(selection.vmd, m, (mmd) => {
-            window.top.log("ok", `| Complete (animation): ${selection.vmd}`);
             all_animation[key[index_cam]] = mmd;
             index_cam++;
             if (index_cam < key.length) {
@@ -258,7 +216,7 @@ window.loadAll = (e) => {
             } else{
                 loadMap();
             }
-        }, (e) => {loading(e, "vmd/animation")});
+        });
     }
     function loadMap(){
         if(selection.map.length < 1){
@@ -274,7 +232,6 @@ window.loadAll = (e) => {
                 CUSTOM = window.top.addFileMap[position];
             }
             loader.load(url, function (e) {
-                window.top.log("ok", `| Complete (map): ${url}`);
                 e.name = name;
                 all_map[url] = e;
                 tur++;
@@ -283,7 +240,7 @@ window.loadAll = (e) => {
                 } else{
                     addAll();
                 } 
-            }, (e) => {loading(e, "map/object")}, undefined, CUSTOM);
+            }, undefined, undefined, CUSTOM);
         }
     }
     function addAll(){
@@ -304,19 +261,13 @@ window.loadAll = (e) => {
         }
         ready = true;
         animate();
-        if (window.top._meshManager) {
+        if(window.top._meshManager){
             window.top._meshManager.append();
-            window.top.anyChange();
         }
-        window.top.log("ok", `| Complete all`);
-        
     }
 
 }
-function loading(xhr, type){
-    let value = xhr.loaded / xhr.total * 20;
-    window.top.log("info", `${type}: ${cmt.slice(-value)}>`);
-}
+
 window.onWindowResize = () => {
     var outValue = {
         width : window.innerWidth,
@@ -358,12 +309,10 @@ window.onWindowResize = () => {
             }
         }
     }
-
-    renderer.setSize(outValue.width, outValue.height);
-    composer.setSize(outValue.width, outValue.height);
-
     camera.aspect = outValue.width / outValue.height;
     camera.updateProjectionMatrix();
+
+    effect.setSize(outValue.width, outValue.height);
 }
 
 //
@@ -376,37 +325,28 @@ function render() {
     // document.querySelector(".info").innerText = "clock: " + t;
     if (ready) {
         helper.update(t);
-    } else{
+        if(MorInfo){
+            MorInfo.update(mesh);
+        }
+    } else {
         return;
     }
-    composer.render(t);
-    // camera.updateProjectionMatrix();
-    try {
-        if (window.moveCam) {
-            moveCam.update(t);
-        }
-    } catch (w) {
-    }
+    effect.render(scene, camera);
 }
+
 
 
 //
-window.addEventListener("dblclick", () => {
-    if(!window.moveCam) return;
-    if(!window.moveCam.lockmouse) return;
-    window.moveCam.lockmouse();
+
+window.addEventListener('beforeunload', (e) => {
+    e.preventDefault()
+    return (e.returnValue = 'Are you sure you want to close?');
+
 });
-
-
-window.onerror = (mess, file, line, col, error) => {
-    var a = file;
-    if(file && file.indexOf("/") !== -1){
-        let sp = a.split("/");
-        a = sp[sp.length - 1];
+// Hide contextmenu when no hold ctrl
+document.addEventListener("contextmenu", (e) => {
+    if(!e.ctrlKey){
+        e.preventDefault();
     }
-    if(!file){a="console?"}
-    window.top.log("error", `-Error on [${a}] - ${line}:${col}</br>>${mess}`);
-}
-window.addEventListener('unhandledrejection', function (e) {
-    window.top.log("error", e.reason);
-});
+
+}, {passive: false});

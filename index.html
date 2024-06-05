@@ -15,7 +15,7 @@
         }
     </script>
     <script type="module" src="get.js"></script>
-    <script src="help.js"></script>
+    <script src="js/help.js"></script>
 </head>
 <body>
     <div class="main-content">
@@ -35,6 +35,8 @@
                         <div class="item-box-menu open-zip-mode-file-mot">Open File (motion)</div>
 
                     </div>
+
+
                 </div>
             </div>
             <div class="content">
@@ -42,10 +44,14 @@
                     <div class="lf-container">
                         <div class="top-selection">
                             <div class="option-lf" data-for="#setup-render">Setup</div>
+                            <div class="option-lf" data-for="#window-log">Log</div>
                         </div>
                         <div class="list-container">
                             <div class="cont-item -option-show-" id="setup-render">
                                 <div class="cs-btn" id="load-all">Load All</div>
+                            </div>
+                            <div class="cont-item" id="window-log">
+                                <div class="log-content"></div>
                             </div>
                         </div>
                     </div>
@@ -91,7 +97,9 @@
                             </div>
                             <div class="tit">Record Video</div>
                             <div class="record-canvas">
-                                <div class="cs-btn rec-item start-record">Start</div>
+                                <div class="rec-item">
+                                    <div class="cs-btn start-record">Start</div>
+                                </div>
                                 <div class="rec-item type-video">
                                     <div class="tit">Video Type</div>
                                     <select class="cs-select-input" id="record-type">

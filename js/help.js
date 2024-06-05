@@ -17,10 +17,12 @@ class FileControl{
         }
         this.callbackLeft = [];
         this.callbackRight = [];
+        this.callbackRemoveAll = [];
     }
     create(){
         if(!this.params.file) return;
         var fileList = "";
+        var isHaveEx = false;
         this.count = 1;
         for (let i = 0; i < this.params.file.length; i++) {
             const e = this.params.file[i];
@@ -47,15 +49,19 @@ class FileControl{
                     <div class="mi-ovl" data-src="${s}"></div>
                 </div>
                 `;
+                isHaveEx = true;
                 this.count++;
             }
             this.count++;
         }
+        var ex = `<div class="mid-ct-btn" title="Hide misc file">H</div>`;
         let html = `
         <div class="map-ct m-box mmd-box-left"></div>
         <div class="map-sw mid-control">
-            <div class="mid-ct-btn">&lt;</div>
-            <div class="mid-ct-btn">&gt;</div>
+            <div class="mid-ct-btn" title="Move to selected box">&lt;</div>
+            <div class="mid-ct-btn" title="Remove select">&gt;</div>
+            <div class="mid-ct-btn" title="Remove all select">&gt;&gt;</div>
+            ${isHaveEx ? ex : ""}
         </div>
         <div class="map-ct m-box mmd-box-right">
             ${fileList}
@@ -138,8 +144,8 @@ class FileControl{
         .mi-ovl:hover { background-color: #ffffff32; }
         .mmd-selected { background-color: #00ffff35 !important; }
         .small-child, .add-zip-child { width: calc(100% - 15px); margin-left: 15px; }
-        .small-child::before { content: '|'; position: absolute; left: -11px; }
-        .add-zip-child::before { content: '+'; position: absolute; left: -10px; }
+        .small-child::before { content: '|'; position: absolute; left: -10px; }
+        .add-zip-child::before { content: '+'; position: absolute; left: -10px; background: green; height: 100%; padding: 1px; }
         .mmd-item-stat { padding-right: 2px; }
 
         `;
@@ -148,6 +154,18 @@ class FileControl{
     _addEvent(){
         if(this.manager){
             const scope = this;
+            this.manager.addEventListener("dblclick", () => {
+                let select = scope.manager.querySelector(".mmd-selected");
+                if (!select) return;
+                let deep = select.parentElement.parentElement;
+                if (deep.classList[2] == "mmd-box-right") {
+                    scope.left.appendChild(select.parentElement);
+                    scope._callEvent(scope, "left", select.dataset.src, select);
+                } else if (deep.classList[2] == "mmd-box-left") {
+                    scope.right.appendChild(select.parentElement);
+                    scope._callEvent(scope, "right", select.dataset.src, select);
+                }
+            });
             this.manager.addEventListener("click", (event) => {
                 scope.clickEnent = event;
                 let {target} = event;
@@ -162,7 +180,33 @@ class FileControl{
                     }
                 }
                 if(target.className == "mid-ct-btn"){
+                    if (target.innerText == "H") {
+                        scope.manager.querySelectorAll(".mmd-item.small-child").forEach(e => {
+                            e.style.display = "none";
+                        });
+                        target.innerText = "S";
+                    } else if (target.innerText == "S") {
+                        scope.manager.querySelectorAll(".mmd-item.small-child").forEach(e => {
+                            e.style.display = "";
+                        });
+                        target.innerText = "H";
+                    }
+                    if(target.innerHTML == "&gt;&gt;"){
+                        let all = scope.left.querySelectorAll(".mmd-item");
+                        let data = [];
+                        let obj = [];
+                        for (let i = 0; i < all.length; i++) {
+                            const e = all[i];
+                            let ov = e.querySelector(".mi-ovl");
+                            data.push(ov.dataset.src);
+                            obj.push(ov);
+                            scope.right.appendChild(e);
+                        }
+                        scope._callEvent(scope, "allRight", data, obj);
+                    }
+
                     let select = scope.manager.querySelector(".mmd-selected");
+                    if(!select) return;
                     let deep = select.parentElement.parentElement;
                     if(target.innerHTML == "&lt;"){
                         if(deep.classList[2] == "mmd-box-right"){
@@ -176,7 +220,8 @@ class FileControl{
                             scope._callEvent(scope, "right", select.dataset.src, select);
                         }
                     }
-
+                    
+                    
 
                 }
             })
@@ -195,18 +240,26 @@ class FileControl{
                 f(data, element);
             }
         }
+        if(type == "allRight"){
+            for (let i = 0; i < scope.callbackRemoveAll.length; i++) {
+                const f = scope.callbackRemoveAll[i];
+                f(data, element);
+            }
+        }
     }
     /**
      * 
-     * @param {String} type type event when file move: left | right
+     * @param {String} type type event when file move: left | right | allRight
      * @param {Function} callback callback event
      */
     on(type, callback){
         if(type){
             if(type === "left" && typeof callback === "function"){
-                this.callbackLeft.push(callback)
+                this.callbackLeft.push(callback);
             } else if(type === "right" && typeof callback === "function"){
-                this.callbackRight.push(callback)
+                this.callbackRight.push(callback);
+            } else if(type === "allRight" && typeof callback === "function"){
+                this.callbackRemoveAll.push(callback);
             }
         }
     }
@@ -281,6 +334,13 @@ class MeshManager{
         this.scene = scene;
         this.params = params;
         this.objId = {};
+        this.callEvent = {
+            posChange: [],
+            scaleChange: [],
+            nameChange: [],
+            visibleChange: [],
+            toneMappedChange: []
+        }
     }
     append(){
         this.mesh = this.getMesh(this.scene);
@@ -288,7 +348,7 @@ class MeshManager{
         var htMesh = "";
         for (let i = 0; i < this.mesh.length; i++) {
             const e = this.mesh[i];
-            htName += `<div class="mesh-item" data-id="${e.uuid}">${e.name}</div>`;
+            htName += `<div class="mesh-item" data-id="${e.uuid}" title="${e.name}">${e.name}</div>`;
             var htMaterial = "";
 
             for (let k = 0; k < e.material.length; k++) {
@@ -310,6 +370,7 @@ class MeshManager{
         this.conatiner.appendChild(box);
         this.target = box;
         this._addEvent();
+        this._upObj();
     }
     /**
      * 
@@ -354,7 +415,7 @@ class MeshManager{
         var htMesh = "";
         for (let i = 0; i < needAdd.length; i++) {
             const e = needAdd[i];
-            htName += `<div class="mesh-item" data-id="${e.uuid}">${e.name}</div>`;
+            htName += `<div class="mesh-item" data-id="${e.uuid}" title="${e.name}">${e.name}</div>`;
             var htMaterial = "";
 
             for (let k = 0; k < e.material.length; k++) {
@@ -366,6 +427,68 @@ class MeshManager{
         this.target.querySelector(".mesh-select").insertAdjacentHTML("beforeend", htName);
         this.target.insertAdjacentHTML("beforeend", htMesh);
 
+        this._upObj();
+    }
+    /**
+     * 
+     * @param {Object} mesh mesh
+     * @param {Object} option 
+     * @param {Object} option.position
+     * @param {Object} option.scale
+     * @param {Object} option.material
+     */
+    updateOption(mesh, option){
+        let {position, scale, material} = option;
+        let scope = this;
+        if(position){
+            let {x, y, z} = position;
+            mesh.position.set(c(x), c(y), c(z));
+            setDomValue("position");
+        }
+        if(scale){
+            let {x, y, z} = scale;
+            mesh.scale.set(c(x), c(y), c(z));
+            setDomValue("scale");
+        }
+        if(material){
+            let cont = scope.target.querySelector(`.mesh-option[data-mesh="${mesh.uuid}"]`);
+            for (const key in material) {
+                let tar = cont.querySelector(`.material-item[data-index="${key}"]`);
+                let obj = material[key];
+                if(obj.name){
+                    tar.querySelector(".mt-name-edit").value = obj.name;
+                }
+                if(obj.visible === false){
+                    let btn = tar.querySelector(".change-visible-");
+                    btn.innerText = "H";
+                    mesh.material[key*1].visible = false;
+                    btn.dataset.active = "false";
+                }
+                if(obj.toneMapped === false){
+                    let btn = tar.querySelector(".change-tonemapped-");
+                    btn.innerText = "H";
+                    mesh.material[key*1].toneMapped = false;
+                    btn.dataset.active = "false";
+                }
+            }
+        }
+        function setDomValue(type){
+            let cont = scope.target.querySelector(`.mesh-option[data-mesh="${mesh.uuid}"]`);
+            if(cont){
+                if (type == "position") {
+                    let { x, y, z } = position;
+                    cont.querySelector(`.inp-mesh-x[data-mode="position"]`).value = x | 0;
+                    cont.querySelector(`.inp-mesh-y[data-mode="position"]`).value = y | 0;
+                    cont.querySelector(`.inp-mesh-z[data-mode="position"]`).value = z | 0;
+                } else if (type == "scale") {
+                    let { x, y, z } = position;
+                    cont.querySelector(`.inp-mesh-x[data-mode="scale"]`).value = x | 0;
+                    cont.querySelector(`.inp-mesh-y[data-mode="scale"]`).value = y | 0;
+                    cont.querySelector(`.inp-mesh-z[data-mode="scale"]`).value = z | 0;
+                }
+            }
+        }
+        function c(value){ return value ? value : 0 }
     }
     _getHtmlMaterial(data = {}){
         return `
@@ -426,6 +549,12 @@ class MeshManager{
         </div>
     `;
     }
+    _upObj() {
+        for (let i = 0; i < this.mesh.length; i++) {
+            const m = this.mesh[i];
+            this.objId[m.uuid] = m;
+        }
+    }
     _getEleArr(s){
         var ar = [];
         let a = this.target.querySelectorAll(s);
@@ -444,11 +573,70 @@ class MeshManager{
         }
         return filter;
     }
+    /**
+     * 
+     * @param {String} type type event "posChange" | "scaleChange" | "nameChange" | "visibleChange" | "toneMappedChange"
+     * @param {Function} callback callback function
+     * @returns 
+     */
+    on(type, callback){
+        if(typeof callback !== "function") return;
+        if(type === "posChange"){
+            this.callEvent.posChange.push(callback);
+        } else if(type === "scaleChange"){
+            this.callEvent.scaleChange.push(callback);
+        } else if(type === "nameChange"){
+            this.callEvent.nameChange.push(callback);
+        } else if(type === "visibleChange"){
+            this.callEvent.visibleChange.push(callback);
+        } else if(type === "toneMappedChange"){
+            this.callEvent.toneMappedChange.push(callback);
+        } 
+    }
+    _callCustomEv(type, e){
+        if(type === "posChange"){
+            for (let i = 0; i < this.callEvent.posChange.length; i++) {
+                const ev = this.callEvent.posChange[i];
+                if(typeof ev === "function") ev(e);
+            }
+        } else if(type === "scaleChange"){
+            for (let i = 0; i < this.callEvent.scaleChange.length; i++) {
+                const ev = this.callEvent.scaleChange[i];
+                if(typeof ev === "function") ev(e);
+            }
+        } else if(type === "nameChange"){
+            for (let i = 0; i < this.callEvent.nameChange.length; i++) {
+                const ev = this.callEvent.nameChange[i];
+                if(typeof ev === "function") ev(e);
+            }
+        } else if(type === "visibleChange"){
+            for (let i = 0; i < this.callEvent.visibleChange.length; i++) {
+                const ev = this.callEvent.visibleChange[i];
+                if(typeof ev === "function") ev(e);
+            }
+        } else if(type === "toneMappedChange"){
+            for (let i = 0; i < this.callEvent.toneMappedChange.length; i++) {
+                const ev = this.callEvent.toneMappedChange[i];
+                if(typeof ev === "function") ev(e);
+            }
+        } 
+    }
     _addEvent(){
         if(!this.target) return;
         let scope = this;
         function changeValue(e){
             var {target} = e;
+            if(target.classList[0] == "mt-name-edit"){
+                let data = target.parentElement.parentElement.dataset;
+                let evType = "nameChange";
+                scope._callCustomEv(evType, {
+                    type: evType,
+                    modelName: scope.objId[data.for].name,
+                    newValue: target.value,
+                    object: scope.objId[data.for],
+                    index: data.index
+                });
+            }
             if(target.classList[0] == "input-mesh-option"){
                 let {mode} = target.dataset;
                 if(mode == "position" || mode == "scale"){
@@ -463,12 +651,46 @@ class MeshManager{
                             }
                         }
                     } 
-                    if(target.classList[1] == "inp-mesh-x"){ scope.objId[meshId][mode].x = target.valueAsNumber }
-                    if(target.classList[1] == "inp-mesh-y"){ scope.objId[meshId][mode].y = target.valueAsNumber }
-                    if(target.classList[1] == "inp-mesh-z"){ scope.objId[meshId][mode].z = target.valueAsNumber }
+                    if(target.classList[1] == "inp-mesh-x"){
+                        let evType = mode == "position" ? "posChange" : "scaleChange";
+                        scope._callCustomEv(evType, {
+                            type: evType,
+                            modelName: scope.objId[meshId].name,
+                            pos: "x",
+                            oldValue: scope.objId[meshId][mode].x,
+                            newValue: target.valueAsNumber,
+                            object: scope.objId[meshId]
+                        });
+                        scope.objId[meshId][mode].x = target.valueAsNumber; 
+                    }
+                    if(target.classList[1] == "inp-mesh-y"){
+                        let evType = mode == "position" ? "posChange" : "scaleChange";
+                        scope._callCustomEv(evType, {
+                            type: evType,
+                            modelName: scope.objId[meshId].name,
+                            pos: "y",
+                            oldValue: scope.objId[meshId][mode].y,
+                            newValue: target.valueAsNumber,
+                            object: scope.objId[meshId]
+                        });
+                        scope.objId[meshId][mode].y = target.valueAsNumber; 
+                    }
+                    if(target.classList[1] == "inp-mesh-z"){
+                        let evType = mode == "position" ? "posChange" : "scaleChange";
+                        scope._callCustomEv(evType, {
+                            type: evType,
+                            modelName: scope.objId[meshId].name,
+                            pos: "z",
+                            oldValue: scope.objId[meshId][mode].z,
+                            newValue: target.valueAsNumber,
+                            object: scope.objId[meshId]
+                        });
+                        scope.objId[meshId][mode].z = target.valueAsNumber; 
+                    }
                 }
             }
         }
+
         this.target.addEventListener("change", changeValue);
         this.target.addEventListener("click", (e) => {
             scope.clickEnent = e;
@@ -540,6 +762,14 @@ class MeshManager{
                         const e = this.mesh[i];
                         if (e.uuid == id) {
                             let tg = e.material[index * 1].visible;
+                            let evType = "visibleChange";
+                            this._callCustomEv(evType, {
+                                type: evType,
+                                modelName: e.name,
+                                newValue: !tg,
+                                object: e,
+                                index: index
+                            });
                             if (tg) {
                                 e.material[index * 1].visible = false;
                                 target.innerText = "H";
@@ -559,6 +789,14 @@ class MeshManager{
                         const e = this.mesh[i];
                         if (e.uuid == id) {
                             let tg = e.material[index * 1].toneMapped;
+                            let evType = "toneMappedChange";
+                            this._callCustomEv(evType, {
+                                type: evType,
+                                modelName: e.name,
+                                newValue: !tg,
+                                object: e,
+                                index: index
+                            });
                             if (tg) {
                                 e.material[index * 1].toneMapped = false;
                                 target.innerText = "F";
@@ -585,6 +823,38 @@ class MeshManager{
  * @param {Boolean} url Is auto create object url
  * @returns {Array} name, file, url
  */
+function readZip(zip, url){
+    var u = URL.createObjectURL(zip);
+    return new Promise((resolve, reject) => {
+        JSZipUtils.getBinaryContent(u, function(err, data) {
+            if(err) {
+                throw err; // or handle err
+            }
+        
+            JSZip.loadAsync(data, { encoding: 'Shift-JIS' }).then(async function (e) {
+               if(e){
+                e.files
+                var arr = [];
+                for (const k in e.files) {
+                    if(e.files[k]){
+                        var f = await e.files[k].async("blob");
+                        var p = "none";
+                        if(url){p = URL.createObjectURL(f)}
+                        arr.push({
+                            name: k,
+                            file: f,
+                            url: p
+                        });
+                    }
+                }
+                resolve(arr);
+               } else{
+                reject("unknow");
+               }
+            });
+        });
+    });
+}
 var loader;
 function readZip(zip, url) {
     if (!loader) {
@@ -642,13 +912,15 @@ class RecordVideo{
         this.record = [];
         this.time = 0;
         this.totalTime = 0;
+        this.videoBit = 8000000;
         this.setType(type);
     }
     start(){
         if(this.recording) return;
         this.stream = this.canvas.captureStream(this.fps);
         this.recorder = new MediaRecorder(this.stream, {
-            mimeType: this.type
+            mimeType: this.type,
+            videoBitsPerSecond: this.videoBit,
         });
           //bruh
         let that = this;
@@ -690,11 +962,31 @@ class RecordVideo{
         if(typeof callback == "function") this.updateRuning = callback;
 
     }
+    /**
+     * 
+     * @param {Number} fps 
+     * @returns {RecordVideo}
+     */
     setFps(fps){
-        if(!fps) return;
+        if(!fps) return this;
         this.fps = fps;
         return this;
     }
+    /**
+     * 
+     * @param {Number} bit videoBitsPerSecond: 2000000+
+     * @returns {RecordVideo}
+     */
+    setVideoBit(bit){
+        if(!bit) return this;
+        this.videoBit = bit;
+        return this;
+    }
+    /**
+     * 
+     * @param {String} type 
+     * @returns {RecordVideo}
+     */
     setType(type){
         if(type){
             let sup = MediaRecorder.isTypeSupported(type);
@@ -713,7 +1005,7 @@ class RecordVideo{
         ];
         for (let i = 0; i < types.length; i++) {
             const e = types[i];
-            let sup = MediaRecorder.isTypeSupported(type);
+            let sup = MediaRecorder.isTypeSupported(e);
             if(sup){
                 this.type = e;
                 console.warn(`| Swich to ${e}`);

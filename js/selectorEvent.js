@@ -1,226 +1,23 @@
-var render = document.querySelector(".render");
-var renderWindow = document.querySelector("#main-render");
-var fileList = document.querySelector("#setup-render");
-var leftTopSelect = document.querySelector(".top-selection");
-var setUp = document.querySelector("#setup-render");
-var loadbtn = setUp.querySelector("#load-all");
-var meshView = document.querySelector("#mesh-view-option");
-var domAni = document.querySelector(".animation-time");
-var domCam = document.querySelector(".camera-time");
-var _sync = false;
-var modelFile;
-var cameraFile;
-var vmdFile;
-var mapFile;
-var res;
-var _meshManager;
-var selection = {
-    model: [],
-    camera: [],
-    vmd: [],
-    map: []
-};
-var addFile = {};
-var addFileMap = {};
-var addFileVmd = {};
-var renderOption = {
-    quality: "auto",
-    plus: "auto",
-    ratio: "auto"
-}
-var record;
-// leftTopSelect.addEventListener("click", (e) => {
-//     if (e.target.className == "option-lf") {
-//         let a = document.querySelector(e.target.dataset.for);
-//         if (a) {
-//             a.style.display == "block" ? a.style.display = "" : a.style.display = "block";
-//         }
-//     }
-// });
 
-function loadFileList() {
-    modelFile = new FileControl(setUp, {file: window.file.models, style: true, showPath: true});
-    modelFile.create();
-    modelFile.on("left", (url, e) => {
-        selection.model.push({
-            url: url,
-            name: e.previousElementSibling.previousElementSibling.innerText,
-            position: e.dataset.pos
-        });
-        window.renderFrame.addMesh(url, e);
-        anyChange();
-    });
-    modelFile.on("right", (url, e) => {
-        removeItem(selection.model, {
-            url: url,
-            name: e.previousElementSibling.previousElementSibling.innerText,
-            position: e.dataset.pos
-        });
-        window.renderFrame.removeMesh(url);
-        anyChange();
-    });
-
-    cameraFile = new FileControl(setUp, {file: window.file.camera});
-    cameraFile.create();
-    cameraFile.on("left", (url) => {
-        selection.camera.push(url);
-    });
-    cameraFile.on("right", (url) => {
-        removeItem(selection.camera, url);
-    });
-
-    vmdFile = new FileControl(setUp, {file: window.file.vmd});
-    vmdFile.create();
-    vmdFile.on("left", (url) => {
-        selection.vmd.push(url);
-    });
-    vmdFile.on("right", (url) => {
-        removeItem(selection.vmd, url);
-    });
-    var decore = [];
-    for (let i = 0; i < window.file._bg.length; i++) {
-        const e = window.file._bg[i];
-        if(!e.isPmx) continue;
-        let ar = [...e.src];
-        ar.shift();
-        decore.push({
-            name: e.name,
-            src: e.src[0],
-            extension: ar
-        });
-    }
-
-    mapFile = new FileControl(setUp, {file: decore});
-    mapFile.create();
-    mapFile.on("left", (url, e) => {
-        selection.map.push({
-            url: url,
-            name: e.previousElementSibling.previousElementSibling.innerText,
-            position: e.dataset.pos
-        });
-        window.renderFrame.addMap(url, e);
-        anyChange();
-    });
-    mapFile.on("right", (url, e) => {
-        removeItem(selection.map, {
-            url: url,
-            name: e.previousElementSibling.previousElementSibling.innerText,
-            position: e.dataset.pos
-        });
-        window.renderFrame.removeMap(url);
-        anyChange();
-    });
-}
-loadFileList()
 loadbtn.addEventListener("click", ()=>{
     let wait = new Promise((resolve, reject) => {
         res = resolve;
         renderWindow.contentWindow.location.reload();
     })
+    log("info", `Load All With: ${selection.model.length} model, ${selection.camera.length} camera, ${selection.vmd.length} vmd, ${selection.map.length} object`);
     wait.then(() => {
         if (window.renderFrame) {
             const wd = window.renderFrame;
             wd.loadAll(selection);
             meshView.innerHTML = "";
             _meshManager = new MeshManager(meshView, wd.scene);
+            setUpManager(_meshManager);
             record = new RecordVideo(renderFrame.renderer.domElement);
             document.querySelector(".record-canvas").style.opacity = "1";
         }
     });
 });
-function anyChange(){
-    if(_meshManager){
-        _meshManager.update(window.renderFrame.scene);
-    }
-}
-function removeItem(arr, value){
-    if(!arr) return;
-    for (let i = 0; i < arr.length; i++) {
-        const e = arr[i];
-        if (typeof e !== "object"){
-            if(e == value){
-                arr.splice(i, 1);
-            }
-        } else{
-            if(e.url){
-                if(e.url == value.url){
-                    arr.splice(i, 1);
-                }
-            }
-        }
-        
-    }
-}
 
-function getTimeAnimation(url){
-    if(window.renderFrame){
-        var time = {
-            currentTime: 0,
-            duration: 0
-        }
-        if(!window.renderFrame.helper) return time;
-        let wd = window.renderFrame;
-        let mesh = wd.all_mesh[url];
-        if(!mesh) return time;
-        try {
-            time.currentTime = wd.helper.objects.get(mesh).mixer._actions[0].time;
-        } catch (e) {
-            return time;
-        }
-        time.duration = wd.all_animation[url].duration;
-        return time;
-    }
-}
-function getTimeCamera(){
-    if(window.renderFrame){
-        var time = {
-            currentTime: 0,
-            duration: 0.1
-        }
-        if(!window.renderFrame.helper) return time;
-        let wd = window.renderFrame;
-        let cam = wd.camera;
-        if(!cam) return time;
-        try {
-            time.currentTime = wd.helper.objects.get(cam).mixer._actions[0].time;
-        } catch (e) {
-            return time;
-        }
-        time.duration = wd.all_cam.duration;
-        return time;
-    }
-}
-function setTimeForAnimate(url, value = 0){
-    if(!url) return;
-    let wd = window.renderFrame;
-    let mesh = wd.all_mesh[url];
-    wd.helper.objects.get(mesh).mixer._actions[0].time = value;
-}
-function setTimeForCam(value = 0){
-    let wd = window.renderFrame;
-    let cam = wd.camera;
-    wd.helper.objects.get(cam).mixer._actions[0].time = value;
-}
-setInterval(() => {
-    if(window.renderFrame){
-        if(window.renderFrame.ready){
-            var animate = getTimeAnimation(selection.model[0].url);
-            var cam = getTimeCamera();
-            var aniCurrent = domAni.querySelector(".bar-time-current");
-            var aniDur = domAni.querySelector(".bar-time-duration");
-            var camCurrent = domCam.querySelector(".bar-time-current");
-            var camDur = domCam.querySelector(".bar-time-duration");
-            var bar1 = domAni.querySelector(".prog-bar");
-            var bar2 = domCam.querySelector(".prog-bar");
-            aniCurrent.innerText = timeToMin(secondsToTime(animate.currentTime));
-            aniDur.innerText = timeToMin(secondsToTime(animate.duration));
-            camCurrent.innerText = timeToMin(secondsToTime(cam.currentTime));
-            camDur.innerText = timeToMin(secondsToTime(cam.duration));
-            bar1.style.width = `${(animate.currentTime/animate.duration)*100}%`;
-            bar2.style.width = `${(cam.currentTime/cam.duration)*100}%`;
-        }
-    }
-}, 999);
 domAni.querySelector(".bar-progress").addEventListener("click", (e) =>{
     if(!window.renderFrame) return;
     if(!window.renderFrame.ready) return;
@@ -344,17 +141,8 @@ document.querySelector(".camera-control").addEventListener("click", (e)=>{
         }
     }
 });
-function secondsToTime(e = 0) {
-    if(!e) e = 0;
-    const h = Math.floor(e / 3600).toString().padStart(2, '0'),
-        m = Math.floor(e % 3600 / 60).toString().padStart(2, '0'),
-        s = Math.floor(e % 60).toString().padStart(2, '0');
-    return (h + ':' + m + ':' + s);
-}
-function timeToMin(time){
-    let a = time.split(":");
-    return `${a[1]}:${a[2]}`;
-}
+
+
 document.querySelector(".top-bar-list").addEventListener("click", async (e) => {
     var {target} = e;
     if (target.classList[0] == "top-select") {
@@ -390,7 +178,7 @@ document.querySelector(".file-drop-menu").addEventListener("click", async (e) =>
         if (target.classList[1] == "open-zip-mode-map") {
             file = await getHanderFile();
             if (file.type == "application/zip") {
-                let allFile = await readZip2(file, true);
+                let allFile = await readZip(file, true);
                 let key = file.name + Date.now();
                 addFileMap[key] = allFile;
                 for (let i = 0; i < allFile.length; i++) {
@@ -409,7 +197,7 @@ document.querySelector(".file-drop-menu").addEventListener("click", async (e) =>
         if (target.classList[1] == "open-zip-mode-vmd") {
             file = await getHanderFile();
             if (file.type == "application/zip") {
-                let allFile = await readZip2(file, true);
+                let allFile = await readZip(file, true);
                 let key = file.name + Date.now();
                 addFileVmd[key] = allFile;
                 for (let i = 0; i < allFile.length; i++) {
@@ -484,61 +272,16 @@ document.addEventListener("click", (e) => {
         document.querySelector(".file-drop-menu").style.display = "";
     }
 });
-function getHanderFile() {
-    return new Promise(async (resolve, reject) => {
-        if (window.showOpenFilePicker) {
-            let files = await window.showOpenFilePicker({ multiple: false });
-            let file = await files[0].getFile();
-            resolve(file);
-        } else{
-            let input = document.querySelector("#__input_file");
-            if(!input){
-                input = document.createElement("input");
-                input.type = "file";
-                input.id = "__input_file";
-            }
-            input.click();
-            input.onchange = () =>{
-                resolve(input.files[0]);
-            }
-        }
-    });
-}
-function downloadBlob(file, name) {
-    let u = URL.createObjectURL(file);
-    let a = document.createElement("a");
-    a.setAttribute("download", name);
-    a.setAttribute("target", "_blank");
-    a.href = u;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-}
-function getBone(key, bone){
-    if(!bone) return;
-    for (let i = 0; i < bone.length; i++) {
-    if(bone[i].name.indexOf(key) !== -1){
-        console.log(i);
-        console.log(bone[i]);
-        return bone[i];
-    }
-}
-}
-window.addEventListener('beforeunload', (e) => {
-    e.preventDefault()
-    return (e.returnValue = 'Are you sure you want to close?');
 
-});
-// No reload page in mobile
-// document.addEventListener("touchmove", (e) => {
-//     if(e.cancelable){
-//         e.preventDefault();
-//     }
-// }, {passive: false});
-// Hide contextmenu when no hold ctrl
-document.addEventListener("contextmenu", (e) => {
-    if(!e.ctrlKey){
-        e.preventDefault();
-    }
+document.querySelectorAll(".top-selection").forEach(e => {
+    e.addEventListener("wheel", (ev) => {
+        ev.preventDefault();
+        e.scrollBy(ev.deltaY, 0);
+    }, {passive: false});
+})
+window.onload = resize;
+window.addEventListener("resize", resize);
 
-}, {passive: false});
+
+
+log("info", `Load page time: ${Date.now() - (window._start_time_)}ms`);

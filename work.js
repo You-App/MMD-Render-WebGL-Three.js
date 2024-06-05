@@ -524,13 +524,18 @@ function getBone(key, bone){
     }
 }
 }
-
-// No reload page in mobile
-document.addEventListener("touchmove", (e) => {
-    if(e.cancelable){
-        e.preventDefault();
+window.addEventListener('beforeunload', (e) => {
+    if (_setting.b4unload && !_commandData.reloadPage) {
+        e.preventDefault()
+        return (e.returnValue = 'Are you sure you want to close?');
     }
-}, {passive: false});
+});
+// No reload page in mobile
+// document.addEventListener("touchmove", (e) => {
+//     if(e.cancelable){
+//         e.preventDefault();
+//     }
+// }, {passive: false});
 // Hide contextmenu when no hold ctrl
 document.addEventListener("contextmenu", (e) => {
     if(!e.ctrlKey){

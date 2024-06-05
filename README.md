@@ -1,7 +1,7 @@
 # MMD-Render-WebGL-Three.js
 [beta] Render/ open .pmx | zip file use ThreeJs + JSZip.
 - (I code for fun)
-- To open pmx in zip: file -> Open zip (to model) or (to map) -> select file (use window.showOpenFilePicker)
+- To open pmx in zip: file -> Open zip (to model) or (to map) -> select file (use window.showOpenFilePicker | input file)
 - First is model file, second is camera file, third is dance file, fourth is background file
 - click to file name and click "<" to select it, after select click "load all" and wait
 - Defect: using it on mobile is quite difficult (fix later)

@@ -3,7 +3,7 @@ import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
 import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
 import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Move3d } from './mmdManager/js/move.js';
+import { Move3d } from '../js/move.js';
 
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';

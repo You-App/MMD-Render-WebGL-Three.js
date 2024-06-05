@@ -524,6 +524,7 @@ function getBone(key, bone){
     }
 }
 }
+
 // No reload page in mobile
 document.addEventListener("touchmove", (e) => {
     if(e.cancelable){

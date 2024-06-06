@@ -3,7 +3,7 @@
 - (I code for fun)
 - To open pmx in zip: file -> Open zip (to model) or (to map) -> select file (use window.showOpenFilePicker | input file)
 - First is model file, second is camera file, third is dance file, fourth is background file
-- click to file name and click "<" to select it, after select click "load all" and wait
+- click to file name and click "<" to select it (or double click to fast select), after select click "load all" and wait
 - Defect: using it on mobile is quite difficult (fix later)
 ![Demo-1](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/219db686-7c24-42db-b2ab-e126bad625bc)
 7680x2160 image 

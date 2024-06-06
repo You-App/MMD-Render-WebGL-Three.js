@@ -234,7 +234,8 @@ function removeItem(arr, value){
     }
 }
 
-function getTimeAnimation(url){
+function getTimeAnimation(obj){
+    var {url} = obj;
     if(window.renderFrame){
         var time = {
             currentTime: 0,
@@ -286,7 +287,7 @@ function setTimeForCam(value = 0){
 setInterval(() => {
     if(window.renderFrame){
         if(window.renderFrame.ready){
-            var animate = getTimeAnimation(selection.model[0].url);
+            var animate = getTimeAnimation(selection.model[0]);
             var cam = getTimeCamera();
             var aniCurrent = domAni.querySelector(".bar-time-current");
             var aniDur = domAni.querySelector(".bar-time-duration");

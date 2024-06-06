@@ -235,11 +235,14 @@ function removeItem(arr, value){
 }
 
 function getTimeAnimation(obj){
-    var {url} = obj;
+    var url;
+    if(obj){
+        url = obj.url;
+    }
     if(window.renderFrame){
         var time = {
             currentTime: 0,
-            duration: 0
+            duration: 0.1
         }
         if(!window.renderFrame.helper) return time;
         let wd = window.renderFrame;

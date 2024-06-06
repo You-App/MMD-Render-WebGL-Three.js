@@ -40,6 +40,19 @@ var models = [
         toneMappingExposure: 0.55,
         extension: []
     },
+    {
+        name: "Navia",
+        pathName: "Genshin",
+        src: "../lib/mmd/models/navia/navia.pmx",
+        color: 0xdddddd,
+        toneMappingExposure: 0.55,
+        extension: [
+            "../lib/mmd/models/navia/2.pmx",
+            "../lib/mmd/models/navia/3.pmx",
+            "../lib/mmd/models/navia/4.pmx",
+            "../lib/mmd/models/navia/5.pmx",
+        ]
+    },
 ];
 
 var vmd = [

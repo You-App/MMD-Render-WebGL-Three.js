@@ -1,11 +1,11 @@
 // file url
-// maybe it can write as json...
+// maybe it can write as json... but later
 var models = [
     {
         name: "Furina P",
         pathName: "Genshin",
         src: "../lib/mmd/models/furina/1.pmx",
-        color: 0xdddddd,
+        color: 0xdddddd,  /* maybe not use */
         toneMappingExposure: 0.55,
         extension: [
             "../lib/mmd/models/furina/3.pmx", "../lib/mmd/models/furina/4.pmx",
@@ -48,7 +48,7 @@ var models = [
         toneMappingExposure: 0.55,
         extension: [
             "../lib/mmd/models/navia/2.pmx",
-            "../lib/mmd/models/navia/3.pmx",
+            "../lib/mmd/models/navia/3.pmx", 
             "../lib/mmd/models/navia/4.pmx",
             "../lib/mmd/models/navia/5.pmx",
         ]
@@ -61,7 +61,7 @@ var vmd = [
         src: "../lib/mmd/vmd/1/wavefile_v2.vmd"
     },
     {
-        name: "ねこみみ。。。",
+        name: "ねこみみ。。。", 
         src: "../lib/mmd/vmd/2/neko.vmd"
     },
     {
@@ -72,7 +72,7 @@ var vmd = [
 
 var camera = [
     {
-        name: "Default",
+        name: "default",
         src: "../lib/mmd/camera/1/wavefile_camera.vmd"
     },
     {

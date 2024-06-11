@@ -15,3 +15,4 @@ Try to add bloom (fail)
 ![MMD renderer - 1717334851694](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/dda6e43e-53d5-4c90-b624-294dfa1a977d)
 Unkown why error in r165 but r158 not
 ![Screenshot 2024-06-05 3 56 22 PM](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/8b714663-bce0-4de5-8fb7-73f04f780448)
++ Lazy to update 

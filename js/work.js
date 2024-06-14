@@ -365,6 +365,7 @@ function resize(){
             zoom = window.innerWidth / (_re_size.width * 0.5);
         }
         document.querySelector(".main-content").style.zoom = zoom;
+        isMobile = mobileCheck();
     }
 }
 /**

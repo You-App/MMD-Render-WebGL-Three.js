@@ -362,8 +362,13 @@ window.onWindowResize = () => {
     renderer.setSize(outValue.width, outValue.height);
     composer.setSize(outValue.width, outValue.height);
 
-    camera.aspect = outValue.width / outValue.height;
-    camera.updateProjectionMatrix();
+    if (window.moveCam && !window.top.isMobile) {
+        window.moveCam.camera.aspect = outValue.width / outValue.height;
+        window.moveCam.camera.updateProjectionMatrix();
+    } else {
+        camera.aspect = outValue.width / outValue.height;
+        camera.updateProjectionMatrix();
+    }
 }
 
 //

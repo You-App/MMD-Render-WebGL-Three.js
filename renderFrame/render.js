@@ -229,7 +229,8 @@ window.loadAll = (e) => {
             loadVmd();
             if (window.top.isMobile) {
                 moveCam = new OrbitControls(camera, renderer.domElement);
-
+                 moveCam.minDistance = 5;
+                 moveCam.maxDistance = 120;
             } else {
                 moveCam = new Move3d(camera, { speed: 50, fly: 0.55, position: [0, 9, 25] });
             }

@@ -27,8 +27,8 @@ window.renderScene = null;
 window.bloomPass = null;
 window.outputPass = null;
 window.bloom = {
-    threshold: 0.8,
-    strength: 0.4,
+    threshold: 0.7,
+    strength: 0.7,
     radius: 1,
     exposure: 1
 };
@@ -69,14 +69,14 @@ function init() {
     scene.add(camera);
     // window.ambient = new THREE.AmbientLight(0xdddddd, 3); //aaa
     // scene.add(ambient);
-    hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
-    hemiLight.position.set(0, 300, 0);
-    scene.add(hemiLight);
+    // hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
+    // hemiLight.position.set(0, 300, 0);
+    // scene.add(hemiLight);
     dirLight = new THREE.DirectionalLight(0xffffff);
-    dirLight.position.set(75, 300, -75);
+    dirLight.position.set(-20, 300, 400);
     scene.add(dirLight);
     window.directionalLight = new THREE.DirectionalLight(0xdddddd, 1);
-    directionalLight.position.set(- 1, 1, 1).normalize();
+    directionalLight.position.set(20, 350, -200);
     scene.add(directionalLight);
     renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
     // renderer.setPixelRatio(window.devicePixelRatio);

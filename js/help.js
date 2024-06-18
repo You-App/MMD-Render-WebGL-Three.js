@@ -481,7 +481,7 @@ class MeshManager{
                     cont.querySelector(`.inp-mesh-y[data-mode="position"]`).value = y | 0;
                     cont.querySelector(`.inp-mesh-z[data-mode="position"]`).value = z | 0;
                 } else if (type == "scale") {
-                    let { x, y, z } = position;
+                    let { x, y, z } = scale;
                     cont.querySelector(`.inp-mesh-x[data-mode="scale"]`).value = x | 0;
                     cont.querySelector(`.inp-mesh-y[data-mode="scale"]`).value = y | 0;
                     cont.querySelector(`.inp-mesh-z[data-mode="scale"]`).value = z | 0;

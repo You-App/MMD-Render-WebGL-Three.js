@@ -282,13 +282,14 @@ window.loadAll = (e) => {
     function loadcam(){
         if(selection.camera.length < 1){
             if (window.top.isMobile) {
+                //if this site run on mobile device use this
                 moveCam = new OrbitControls(camera, renderer.domElement);
-
-                console.log(window.top.isMobile);
+                moveCam.position.set(0, 10, - 10); // default pos
             } else {
-                console.log(window.top.isMobile);
+                //if on pc/laptop use this to control with "WASD", "R" to swich to up speed, hold "C" to zoom
                 moveCam = new Move3d(camera, { speed: 50, fly: 0.55, position: [0, 9, 25] });
             }
+            window.top.log("info", `No Camera select, use control Type: ${window.top.isMobile ? "mobile" : "pc"}`);
             loadVmd();
             return;
         }

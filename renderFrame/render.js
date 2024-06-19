@@ -157,12 +157,14 @@ window.removeMesh = (url) => {
         helper.objects.get(all_mesh[url]).mixer = null;
         helper.remove(all_mesh[url]);
         _loading.all--;
+        _loading.load--;
     }
 }
 window.removeMap = (url) => {
     if (all_map[url]) {
         scene.remove(all_map[url]);
         _loading.all--;
+        _loading.load--;
     }
 }
 
@@ -189,6 +191,7 @@ window.addMesh = (url, data) => {
             window.top.log("ok", `| Complete (model): ${url}`);
             m.name = name;
             all_mesh[url] = m;
+            _loading.load++;
             loader.loadAnimation(window.top.selection.vmd, m, (mmd) => {
                 window.top.log("ok", `| Complete (animation): ${window.top.selection.vmd}`);
                 all_animation[url] = mmd;
@@ -235,6 +238,7 @@ window.addMap = (url, name) => {
             loader.load(url, function (e) {
                 window.top.log("ok", `| Complete (map): ${url}`);
                 e.name = fromName;
+                _loading.load++;
                 all_map[url] = e;
                 scene.add(e);
                 load.innerText = "Loaded";

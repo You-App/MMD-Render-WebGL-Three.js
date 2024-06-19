@@ -12,6 +12,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
+// Global to use in parent window
 window.cam3d = null;
 window.scene = null;
 window.renderer  = null;
@@ -45,19 +46,22 @@ window.renderOption = {
 window.ready = false;
 window.callAnimate = [];
 window.clock = new THREE.Clock();
-var _loading = {load:0, all: 0}
 window.all_mesh = {};
 window.all_vmd = {};
 window.all_animation = {};
 window.all_map = {};
 window.all_cam = null;
+
+var _loading = {load:0, all: 0}
 var checkTime = 0;
 var fps = 0;
-var cmt = "====================";
+var cmt = "===================="; //wut
+
 Ammo().then(function () {
     init();
     render();
 });
+
 function init() {
     if(window.top.renderOption){
         window.renderOption = window.top.renderOption;

@@ -18,6 +18,7 @@ class FileControl{
         this.callbackLeft = [];
         this.callbackRight = [];
         this.callbackRemoveAll = [];
+        this.name = "";
     }
     create(){
         if(!this.params.file) return;
@@ -44,7 +45,7 @@ class FileControl{
                 }
                 fileList += `
                 <div class="mmd-item small-child" style="--s: ${this.count}">
-                    <div class="mmd-item-name">${e.name}</div>
+                    <div class="mmd-item-name">${e.name} m${k}</div>
                     <div class="mmd-item-stat">unload</div>
                     <div class="mi-ovl" data-src="${s}"></div>
                 </div>
@@ -54,22 +55,25 @@ class FileControl{
             }
             this.count++;
         }
-        var ex = `<div class="mid-ct-btn" title="Hide misc file">H</div>`;
+        var ex = `<div class="mid-ct-btn -md-hide" title="Hide misc file">H</div>`;
         let html = `
-        <div class="map-ct m-box mmd-box-left"></div>
-        <div class="map-sw mid-control">
-            <div class="mid-ct-btn" title="Move to selected box">&lt;</div>
-            <div class="mid-ct-btn" title="Remove select">&gt;</div>
-            <div class="mid-ct-btn" title="Remove all select">&gt;&gt;</div>
-            ${isHaveEx ? ex : ""}
-        </div>
-        <div class="map-ct m-box mmd-box-right">
-            ${fileList}
+        <div class="mmd-block">
+            <div class="map-ct m-box mmd-box-left"></div>
+            <div class="map-sw mid-control">
+                <div class="mid-ct-btn -md-left" title="Move to selected box">&lt;</div>
+                <div class="mid-ct-btn -md-right" title="Remove select">&gt;</div>
+                <div class="mid-ct-btn -md-all" title="Remove all select">&gt;&gt;</div>
+                ${isHaveEx ? ex : ""}
+            </div>
+            <div class="map-ct m-box mmd-box-right">
+                ${fileList}
+            </div>
         </div>
         `;
+        let title = this.params.title ? `<div class="fc-box-title">${this.params.title}</div>` : "";
         let cont = document.createElement("div");
-        cont.className = "mmd-block";
-        cont.innerHTML = html;
+        // cont.className = "mmd-block";
+        cont.innerHTML = title + html;
         this.manager = cont;
         this.conatiner.appendChild(cont);
         this.left = this.manager.querySelector(".mmd-box-left");
@@ -147,9 +151,20 @@ class FileControl{
         .small-child::before { content: '|'; position: absolute; left: -10px; }
         .add-zip-child::before { content: '+'; position: absolute; left: -10px; background: green; height: 100%; padding: 1px; }
         .mmd-item-stat { padding-right: 2px; }
-
+        .fc-box-title { font-size: 1.2em; margin-left: 5px; }
         `;
         document.head.appendChild(style);
+    }
+    connect(manager){
+        if(!manager || typeof manager !== "object") return;
+        if(this.linked) console.warn("Replace connect");
+        this.linked = manager;
+        let el = document.createElement("div");
+        el.className = "mid-ct-btn";
+        el.classList.add("-md-move");
+        el.innerText = "T";
+        el.title = `Move Object To ${manager.name}`;
+        this.manager.querySelector(".map-sw.mid-control").appendChild(el);
     }
     _addEvent(){
         if(this.manager){
@@ -179,7 +194,7 @@ class FileControl{
 
                     }
                 }
-                if(target.className == "mid-ct-btn"){
+                if(target.classList[0] == "mid-ct-btn"){
                     if (target.innerText == "H") {
                         scope.manager.querySelectorAll(".mmd-item.small-child").forEach(e => {
                             e.style.display = "none";
@@ -191,7 +206,7 @@ class FileControl{
                         });
                         target.innerText = "H";
                     }
-                    if(target.innerHTML == "&gt;&gt;"){
+                    if(target.classList[1] == "-md-all"){
                         let all = scope.left.querySelectorAll(".mmd-item");
                         let data = [];
                         let obj = [];
@@ -204,23 +219,32 @@ class FileControl{
                         }
                         scope._callEvent(scope, "allRight", data, obj);
                     }
-
+                    
                     let select = scope.manager.querySelector(".mmd-selected");
                     if(!select) return;
                     let deep = select.parentElement.parentElement;
-                    if(target.innerHTML == "&lt;"){
+                    if(target.classList[1] == "-md-left"){
                         if(deep.classList[2] == "mmd-box-right"){
                             scope.left.appendChild(select.parentElement);
                             scope._callEvent(scope, "left", select.dataset.src, select);
                         }
                     }
-                    if(target.innerHTML == "&gt;"){
+                    if(target.classList[1] == "-md-right"){
                         if(deep.classList[2] == "mmd-box-left"){
                             scope.right.appendChild(select.parentElement);
                             scope._callEvent(scope, "right", select.dataset.src, select);
                         }
                     }
-                    
+                    if(target.classList[1] == "-md-move"){
+                        if(deep.classList[2] == "mmd-box-left"){
+                            scope._callEvent(scope, "right", select.dataset.src, select);
+                        }
+                        if(deep.classList[2] == "mmd-box-right"){
+                            scope.linked.right.appendChild(select.parentElement);
+                            select.parentElement.attributes.style.value = `--s: 0`;
+                        }
+                        select.classList.remove("mmd-selected");
+                    }
                     
 
                 }
@@ -392,6 +416,16 @@ class MeshManager{
                     }
 
                 }
+            } else if(e.type == "Group"){
+                filter.push(e.children[0]);
+                var isNoDelete = false;
+                for (let k = 0; k < list.length; k++) {
+                    const s = list[k];
+                    if(s.dataset.id == e.uuid){
+                        list.splice(k, 1);
+                    }
+
+                }
             }
         }
         this.mesh = [...filter];
@@ -452,8 +486,10 @@ class MeshManager{
         }
         if(material){
             let cont = scope.target.querySelector(`.mesh-option[data-mesh="${mesh.uuid}"]`);
+            if(!cont) return;
             for (const key in material) {
                 let tar = cont.querySelector(`.material-item[data-index="${key}"]`);
+                if(!tar) continue;
                 let obj = material[key];
                 if(obj.name){
                     tar.querySelector(".mt-name-edit").value = obj.name;
@@ -557,6 +593,7 @@ class MeshManager{
     }
     _getEleArr(s){
         var ar = [];
+        if(!this.target) return ar;
         let a = this.target.querySelectorAll(s);
         a.forEach(e =>{
             ar.push(e);
@@ -817,45 +854,13 @@ class MeshManager{
     }
 }
 
+var loader;
 /**
  * 
  * @param {Blob} zip Blob file
  * @param {Boolean} url Is auto create object url
  * @returns {Array} name, file, url
  */
-function readZip(zip, url){
-    var u = URL.createObjectURL(zip);
-    return new Promise((resolve, reject) => {
-        JSZipUtils.getBinaryContent(u, function(err, data) {
-            if(err) {
-                throw err; // or handle err
-            }
-        
-            JSZip.loadAsync(data, { encoding: 'Shift-JIS' }).then(async function (e) {
-               if(e){
-                e.files
-                var arr = [];
-                for (const k in e.files) {
-                    if(e.files[k]){
-                        var f = await e.files[k].async("blob");
-                        var p = "none";
-                        if(url){p = URL.createObjectURL(f)}
-                        arr.push({
-                            name: k,
-                            file: f,
-                            url: p
-                        });
-                    }
-                }
-                resolve(arr);
-               } else{
-                reject("unknow");
-               }
-            });
-        });
-    });
-}
-var loader;
 function readZip(zip, url) {
     if (!loader) {
         loader = new ThreeLoader();

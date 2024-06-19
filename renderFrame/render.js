@@ -4,6 +4,8 @@ import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
 import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Move3d } from '../js/move.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -11,6 +13,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 window.cam3d = null;
+window.data_file = file;
 window.scene = null;
 window.renderer  = null;
 window.effect = null;
@@ -18,6 +21,8 @@ window.camera = null;
 window.mesh = null;
 window.helper = null;
 window.loader = null;
+window.ObjLoader = null;
+window.MtlLoader = null;
 window.dirLight = null;
 window.hemiLight = null;
 window.moveCam = null;
@@ -39,12 +44,16 @@ window.renderOption = {
     ratio: "auto"
 }
 window.ready = false;
+window.callAnimate = [];
 window.clock = new THREE.Clock();
+var _loading = {load:0, all: 0}
 window.all_mesh = {};
 window.all_vmd = {};
 window.all_animation = {};
 window.all_map = {};
 window.all_cam = null;
+var checkTime = 0;
+var fps = 0;
 var cmt = "====================";
 Ammo().then(function () {
     init();
@@ -73,17 +82,17 @@ function init() {
     // hemiLight.position.set(0, 300, 0);
     // scene.add(hemiLight);
     dirLight = new THREE.DirectionalLight(0xffffff);
-    dirLight.position.set(-20, 300, 400);
+    dirLight.position.set(30, 300, 400); // 75 300 -75
     scene.add(dirLight);
-    window.directionalLight = new THREE.DirectionalLight(0xdddddd, 1);
-    directionalLight.position.set(20, 350, -200);
+    window.directionalLight = new THREE.DirectionalLight(0xcccccc, 1);
+    directionalLight.position.set(-30, 300, -400);
     scene.add(directionalLight);
     renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
     // renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setPixelRatio(1);
     // renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping; //
-    renderer.toneMappingExposure = 0.65; //
+    renderer.toneMappingExposure = 0.7; //
     container.appendChild(renderer.domElement);
 
     renderScene = new RenderPass( scene, camera );
@@ -104,6 +113,8 @@ function init() {
     // effect = new OutlineEffect(renderer);
     helper = new MMDAnimationHelper({ pmxAnimation: true });
     loader = new MMDLoader();
+    ObjLoader = new OBJLoader();
+    MtlLoader = new MTLLoader();
     onWindowResize();
     window.addEventListener('resize', onWindowResize);
     window.addEventListener("keydown", (e) => {
@@ -127,8 +138,21 @@ function init() {
         window.top.res();
     }
 }
-
-
+function loadObjMtl(mtl, obj, callback, onProgress){
+    MtlLoader.load(mtl, (m) => {
+        m.preload();
+        ObjLoader.setMaterials( m );
+        ObjLoader.load( obj, function ( object ) {
+            callback(object);
+        }, (pr) => {
+            if(onProgress) onProgress("obj", pr);
+        });
+    }, (pr) => {
+        if(onProgress) onProgress("mtl", pr);
+    });
+}
+//currentTimeAnimation
+//helper.objects.get(all_mesh['/src/mmd/model/blue_archive/mari_2/1.pmx']).mixer._actions[0].time
 window.removeMesh = (url) => {
     if (all_mesh[url]) {
         scene.remove(all_mesh[url]);
@@ -136,13 +160,16 @@ window.removeMesh = (url) => {
         helper.objects.get(all_mesh[url]).physics = null;
         helper.objects.get(all_mesh[url]).mixer = null;
         helper.remove(all_mesh[url]);
+        _loading.all--;
     }
 }
 window.removeMap = (url) => {
     if (all_map[url]) {
         scene.remove(all_map[url]);
+        _loading.all--;
     }
 }
+
 window.addMesh = (url, data) => {
     if(!ready) return;
     if (all_mesh[url]) {
@@ -155,10 +182,13 @@ window.addMesh = (url, data) => {
     } else{
         let position = data.dataset.pos;
         let name = data.previousElementSibling.previousElementSibling.innerText;
+        let load = data.previousElementSibling;
+        load.innerText = "Loading";
         var CUSTOM;
         if(position && position.length){
             CUSTOM = window.top.addFile[position];
         }
+        _loading.all++;
         loader.load(url, (m) => {
             window.top.log("ok", `| Complete (model): ${url}`);
             m.name = name;
@@ -166,6 +196,7 @@ window.addMesh = (url, data) => {
             loader.loadAnimation(window.top.selection.vmd, m, (mmd) => {
                 window.top.log("ok", `| Complete (animation): ${window.top.selection.vmd}`);
                 all_animation[url] = mmd;
+                load.innerText = "Loaded";
                 setTimeout(() => {
                     scene.add(m);
                     window.top.anyChange();
@@ -175,7 +206,10 @@ window.addMesh = (url, data) => {
                     });
                 }, 200);
             });
-        }, (e) => {loading(e, "model")}, undefined, CUSTOM);
+        }, (e) => {
+            loading(e, "model");
+            load.innerText =  `${(e.loaded / e.total * 100).toFixed(0)}%`; 
+        }, undefined, CUSTOM);
     }
 }
 window.addMap = (url, name) => {
@@ -184,64 +218,90 @@ window.addMap = (url, name) => {
         scene.add(all_map[url]);
     } else {
         const position = name.dataset.pos;
+        let load = name.previousElementSibling;
         var CUSTOM;
         if (position && position.length) {
             CUSTOM = window.top.addFileMap[position];
         }
-        loader.load(url, function (e) {
-            window.top.log("ok", `| Complete (map): ${url}`);
-            e.name = name.previousElementSibling.previousElementSibling.innerText;
-            all_map[url] = e;
-            scene.add(e);
-            window.top.anyChange();
-        }, (e) => {loading(e, "map/object")}, undefined, CUSTOM);
+        _loading.all++;
+        var fromName = name.previousElementSibling.previousElementSibling.innerText;
+        if((url.indexOf(".obj") !== -1 && url.indexOf(".mtl") !== -1) || (name.dataset.pos && fromName.endsWith(".obj"))){
+            let urls = url.split(" && ");
+            loadObjMtl(urls[1], urls[0], (gr) => {
+                window.top.log("ok", `| Complete (map): ${url}`);
+                gr.name = fromName;
+                all_map[url] = gr;
+                scene.add(gr);
+                load.innerText = "Loaded";
+                window.top.anyChange();
+            });
+        } else{
+            loader.load(url, function (e) {
+                window.top.log("ok", `| Complete (map): ${url}`);
+                e.name = fromName;
+                all_map[url] = e;
+                scene.add(e);
+                load.innerText = "Loaded";
+                window.top.anyChange();
+            }, (e) => {
+                loading(e, "map/object");
+                load.innerText =  `${(e.loaded / e.total * 100).toFixed(0)}%`; 
+            }, undefined, CUSTOM);
+        }
     }
 }
-
-
 window.loadAll = (e) => {
     if(ready) return;
     var selection = e;
     if(!selection) return;
     var index = 0;
     var index_cam = 0;
+    var k = selection.model.length + selection.camera.length + selection.vmd.length + selection.map.length;
+    _loading.all = k;
     loadModel();
     function loadModel(){
-        let {url, name, position} = selection.model[index];
+        let {url, name, position, element} = selection.model[index];
         var CUSTOM;
         if(position && position.length){
             CUSTOM = window.top.addFile[position];
         }
         loader.load(url, (m) => {
             index++;
+            _loading.load++;
             m.name = name;
             all_mesh[url] = m;
             window.top.log("ok", `| Complete (model): ${url}`);
+            element.innerText = "Loaded";
             if(index < selection.model.length) {
                 loadModel();
             } else{
                 loadcam();
             }
-        }, (e) => {loading(e, "model")}, undefined, CUSTOM);
+        }, (e) => {
+            loading(e, "model");
+            element.innerText =  `${(e.loaded / e.total * 100).toFixed(0)}%`; 
+        }, undefined, CUSTOM);
     }
     function loadcam(){
         if(selection.camera.length < 1){
-            loadVmd();
             if (window.top.isMobile) {
                 moveCam = new OrbitControls(camera, renderer.domElement);
-                 moveCam.minDistance = 5;
-                 moveCam.maxDistance = 120;
+
+                console.log(window.top.isMobile);
             } else {
+                console.log(window.top.isMobile);
                 moveCam = new Move3d(camera, { speed: 50, fly: 0.55, position: [0, 9, 25] });
             }
+            loadVmd();
             return;
         }
         let url = selection.camera;
         loader.loadAnimation(url, camera, (cameraAnimation) => {
             window.top.log("ok", `| Complete (camera): ${url}`);
+            _loading.load += url.length;
             all_cam = cameraAnimation;
             loadVmd()
-        }, (e) => {loading(e, "camera")});
+        }, (e) => {loading(e, "model")});
     }
     function loadVmd(){
         if(selection.vmd.length < 1){
@@ -252,6 +312,7 @@ window.loadAll = (e) => {
         var m = all_mesh[key[index_cam]];
         loader.loadAnimation(selection.vmd, m, (mmd) => {
             window.top.log("ok", `| Complete (animation): ${selection.vmd}`);
+            _loading.load += selection.vmd.length;
             all_animation[key[index_cam]] = mmd;
             index_cam++;
             if (index_cam < key.length) {
@@ -269,22 +330,44 @@ window.loadAll = (e) => {
         var tur = 0;
         LoadBg();
         function LoadBg(){
-            const {url, name, position} = selection.map[tur];
+            const { url, name, position, element } = selection.map[tur];
             var CUSTOM;
             if(position && position.length){
                 CUSTOM = window.top.addFileMap[position];
             }
-            loader.load(url, function (e) {
-                window.top.log("ok", `| Complete (map): ${url}`);
-                e.name = name;
-                all_map[url] = e;
-                tur++;
-                if(tur < selection.map.length){
-                    LoadBg();
-                } else{
-                    addAll();
-                } 
-            }, (e) => {loading(e, "map/object")}, undefined, CUSTOM);
+            if ((url.indexOf(".obj") !== -1 && url.indexOf(".mtl") !== -1) || (position && fromName.endsWith(".obj"))) {
+                let urls = url.split(" && ");
+                loadObjMtl(urls[1], urls[0], (gr) => {
+                    window.top.log("ok", `| Complete (map): ${url}`);
+                    _loading.load += 2;
+                    gr.name = name;
+                    all_map[url] = gr;
+                    tur++;
+                    element.innerText = "Loaded";
+                    if (tur < selection.map.length) {
+                        LoadBg();
+                    } else {
+                        addAll();
+                    }
+                });
+            } else {
+                loader.load(url, function (e) {
+                    window.top.log("ok", `| Complete (map): ${url}`);
+                    e.name = name;
+                    all_map[url] = e;
+                    _loading.load++;
+                    tur++;
+                    element.innerText = "Loaded";
+                    if (tur < selection.map.length) {
+                        LoadBg();
+                    } else {
+                        addAll();
+                    }
+                }, (e) => {
+                    loading(e, "map/object");
+                    element.innerText = `${(e.loaded / e.total * 100).toFixed(0)}%`;
+                }, undefined, CUSTOM);
+            }
         }
     }
     function addAll(){
@@ -314,9 +397,18 @@ window.loadAll = (e) => {
     }
 
 }
+var timeoutLoad = 0;
 function loading(xhr, type){
     let value = xhr.loaded / xhr.total * 20;
+    let val100 = xhr.loaded / xhr.total * 100;
     window.top.log("info", `${type}: ${cmt.slice(-value)}>`);
+    let load = window.top.document.querySelector(".-progress-info");
+    if(!val100 || val100 == Infinity) val100 = 100;
+    load.innerText = `${type}: ${val100.toFixed(1)}% - (${_loading.load}/${_loading.all})`;
+    clearTimeout(timeoutLoad);
+    timeoutLoad = setTimeout(()=>{
+        load.innerText = "";
+    },3000);
 }
 window.onWindowResize = () => {
     var outValue = {
@@ -355,14 +447,11 @@ window.onWindowResize = () => {
                 }
                 return ratio;
             } else{
-                return window.innerWidth;
+                let currentRatio = window.innerWidth / window.innerHeight;
+                return (height * currentRatio);
             }
         }
     }
-
-    renderer.setSize(outValue.width, outValue.height);
-    composer.setSize(outValue.width, outValue.height);
-
     if (window.moveCam && !window.top.isMobile) {
         window.moveCam.camera.aspect = outValue.width / outValue.height;
         window.moveCam.camera.updateProjectionMatrix();
@@ -370,15 +459,46 @@ window.onWindowResize = () => {
         camera.aspect = outValue.width / outValue.height;
         camera.updateProjectionMatrix();
     }
+    renderer.setSize(outValue.width, outValue.height);
+    composer.setSize(outValue.width, outValue.height);
 }
 
 //
 window.animate = function () {
     window.requestAnimationFrame(animate);
     render();
+    for (let i = 0; i < window.callAnimate.length; i++) {
+        const f = window.callAnimate[i];
+        if (!f) continue;
+        if(typeof f.function === "function"){
+            f.function.call();
+        }
+    }
+}
+window.addCall = (f) => {
+    if(typeof f === "function"){
+        var id = performance.now()
+        window.callAnimate.push({function: f, id: id});
+        return id;
+    }
+}
+window.removeCall = (id) => {
+    for (let i = 0; i < window.callAnimate.length; i++) {
+        const f = window.callAnimate[i];
+        if(f.id == id){
+            window.callAnimate.splice(i, 1);
+            return;
+        }
+    }
+    if(typeof f === "function"){
+        var id = performance.now()
+        window.callAnimate.push({function: f, id: id});
+        return id;
+    }
 }
 function render() {
     var t = clock.getDelta();
+    checkTime++;
     // document.querySelector(".info").innerText = "clock: " + t;
     if (ready) {
         helper.update(t);
@@ -387,19 +507,22 @@ function render() {
     }
     composer.render(t);
     // camera.updateProjectionMatrix();
-    try {
-        if (window.moveCam) {
-            moveCam.update(t);
-        }
-    } catch (w) {
-    }
+    if(window.moveCam){
+        moveCam.update(t);
+    } 
 }
-
+setInterval(() => {
+    fps = checkTime;
+    checkTime = 0;
+    let a = window.top.document.querySelector(".-render-fps");
+    let b = window.top.document.querySelector(".-objects-render");
+    a.innerText = `FPS: ${fps}`;
+    b.innerText = `Objects: ${scene.children.length}`;
+}, 999);
 
 //
 window.addEventListener("dblclick", () => {
-    if(!window.moveCam) return;
-    if(!window.moveCam.lockmouse) return;
+    if(!window.moveCam || window.top.isMobile) return;
     window.moveCam.lockmouse();
 });
 
@@ -411,7 +534,7 @@ window.onerror = (mess, file, line, col, error) => {
         a = sp[sp.length - 1];
     }
     if(!file){a="console?"}
-    window.top.log("error", `-Error on [${a}] - ${line}:${col}</br>>${mess}`);
+    window.top.log("error", `-Error on [${a}] - ${line}:${col}\n>${mess}`);
 }
 window.addEventListener('unhandledrejection', function (e) {
     window.top.log("error", e.reason);

@@ -38,7 +38,16 @@ var _re_size = {
 var _setting = {
     oneSize: true
 }
+var logInfo = {error: 0};
 var isMobile = false;
+var config = {
+    titles: {
+        model: "Model* (.pmx file)",
+        cam: "Camera (.vmd file) no select to use control</br>PC use 'wasd' mobile likely zoom",
+        vmd: "Dance* (.vmd file)",
+        obj: "Object 3d file (no animate):</br>.pmx | (.mtl + .obj)",
+    }
+}
 // leftTopSelect.addEventListener("click", (e) => {
 //     if (e.target.className == "option-lf") {
 //         let a = document.querySelector(e.target.dataset.for);
@@ -55,13 +64,20 @@ function startPage(){
     }
 }
 function loadFileList() {
-    modelFile = new FileControl(setUp, {file: window.file.models, style: true, showPath: true});
+    modelFile = new FileControl(setUp, {
+        file: window.file.models, 
+        style: true, 
+        showPath: true, 
+        title: config.titles.model
+    });
+    modelFile.name = "model";
     modelFile.create();
     modelFile.on("left", (url, e) => {
         selection.model.push({
             url: url,
             name: e.previousElementSibling.previousElementSibling.innerText,
-            position: e.dataset.pos
+            position: e.dataset.pos,
+            element: e.previousElementSibling
         });
         window.renderFrame.addMesh(url, e);
         anyChange();
@@ -70,7 +86,8 @@ function loadFileList() {
         removeItem(selection.model, {
             url: url,
             name: e.previousElementSibling.previousElementSibling.innerText,
-            position: e.dataset.pos
+            position: e.dataset.pos,
+            element: e.previousElementSibling
         });
         window.renderFrame.removeMesh(url);
         anyChange();
@@ -86,7 +103,7 @@ function loadFileList() {
         anyChange();
     });
 
-    cameraFile = new FileControl(setUp, {file: window.file.camera});
+    cameraFile = new FileControl(setUp, {file: window.file.camera, title: config.titles.cam});
     cameraFile.create();
     cameraFile.on("left", (url) => {
         selection.camera.push(url);
@@ -101,7 +118,7 @@ function loadFileList() {
         }
     });
 
-    vmdFile = new FileControl(setUp, {file: window.file.vmd});
+    vmdFile = new FileControl(setUp, {file: window.file.vmd, title: config.titles.vmd});
     vmdFile.create();
     vmdFile.on("left", (url) => {
         selection.vmd.push(url);
@@ -118,7 +135,7 @@ function loadFileList() {
     var decore = [];
     for (let i = 0; i < window.file._bg.length; i++) {
         const e = window.file._bg[i];
-        if(!e.isPmx) continue;
+        if(!e.isPmx && !e.isObj) continue;
         let ar = [...e.src];
         ar.shift();
         decore.push({
@@ -128,13 +145,19 @@ function loadFileList() {
         });
     }
 
-    mapFile = new FileControl(setUp, {file: decore});
+    mapFile = new FileControl(setUp, {file: decore, title: config.titles.obj});
+    mapFile.name = "Object File";
     mapFile.create();
+
+    modelFile.connect(mapFile);
+    mapFile.connect(modelFile);
+
     mapFile.on("left", (url, e) => {
         selection.map.push({
             url: url,
             name: e.previousElementSibling.previousElementSibling.innerText,
-            position: e.dataset.pos
+            position: e.dataset.pos,
+            element: e.previousElementSibling
         });
         window.renderFrame.addMap(url, e);
         anyChange();
@@ -234,15 +257,11 @@ function removeItem(arr, value){
     }
 }
 
-function getTimeAnimation(obj){
-    var url;
-    if(obj){
-        url = obj.url;
-    }
+function getTimeAnimation(url){
     if(window.renderFrame){
         var time = {
             currentTime: 0,
-            duration: 0.1
+            duration: 0
         }
         if(!window.renderFrame.helper) return time;
         let wd = window.renderFrame;
@@ -290,22 +309,30 @@ function setTimeForCam(value = 0){
 setInterval(() => {
     if(window.renderFrame){
         if(window.renderFrame.ready){
-            var animate = getTimeAnimation(selection.model[0]);
-            var cam = getTimeCamera();
             var aniCurrent = domAni.querySelector(".bar-time-current");
             var aniDur = domAni.querySelector(".bar-time-duration");
             var camCurrent = domCam.querySelector(".bar-time-current");
             var camDur = domCam.querySelector(".bar-time-duration");
             var bar1 = domAni.querySelector(".prog-bar");
             var bar2 = domCam.querySelector(".prog-bar");
-            aniCurrent.innerText = timeToMin(secondsToTime(animate.currentTime));
-            aniDur.innerText = timeToMin(secondsToTime(animate.duration));
+            if (selection.model[0]) {
+                var animate = getTimeAnimation(selection.model[0].url);
+                aniCurrent.innerText = timeToMin(secondsToTime(animate.currentTime));
+                aniDur.innerText = timeToMin(secondsToTime(animate.duration));
+                bar1.style.width = `${(animate.currentTime / animate.duration) * 100}%`;
+            }
+            var cam = getTimeCamera();
             camCurrent.innerText = timeToMin(secondsToTime(cam.currentTime));
             camDur.innerText = timeToMin(secondsToTime(cam.duration));
-            bar1.style.width = `${(animate.currentTime/animate.duration)*100}%`;
             bar2.style.width = `${(cam.currentTime/cam.duration)*100}%`;
         }
+        if(window.renderFrame.renderer){
+            let {width, height} = window.renderFrame.renderer.domElement;
+            document.querySelector(".-render-size").innerText = `${width}x${height}`;
+        }
     }
+    let errs = document.querySelector(".-total-err");
+    errs.innerText = `All Error: ${logInfo.error}`;
 }, 999);
 function secondsToTime(e = 0) {
     if(!e) e = 0;
@@ -370,6 +397,7 @@ function resize(){
     }
     isMobile = mobileCheck();
 }
+var erTime = 0;
 /**
  * 
  * @param {String | Number | undefined} type type: info | ok | warn | error 
@@ -379,7 +407,16 @@ function log(type, message){
     var name = "log-info";
     if(type == "ok" || type == 1) name = "log-ok";
     if(type == "warn" || type == 2) name = "log-warn";
-    if(type == "error" || type == 3) name = "log-error";
+    if(type == "error" || type == 3) {
+        name = "log-error";
+        clearTimeout(erTime);
+        var sh = message;
+        if(message.indexOf("\n") !== -1) sh = message.split("\n").join(' ');
+        document.querySelector(".-error-info").innerText = "[!] " + sh;
+        erTime = setTimeout(() => {
+            document.querySelector(".-error-info").innerText = "";
+        }, 5000);
+    };
     let target = document.querySelector(".log-content");
     let e = document.createElement("div");
     e.className = name;
@@ -390,7 +427,7 @@ function log(type, message){
     target.appendChild(e);
     target.parentElement.scrollBy(0, 9999);
     let all = document.querySelectorAll(".log-content > .log-message");
-    if(all.length > 199) all[0].remove();
+    if(all.length > 99) all[0].remove();
 }
 
 
@@ -401,10 +438,12 @@ window.onerror = (mess, file, line, col, error) => {
         a = sp[sp.length - 1];
     }
     if(!file){a="console?"}
-    log("error", `-Error on [${a}] - ${line}:${col}</br>>${mess}`);
+    log("error", `-Error on [${a}] - ${line}:${col}\n|>${mess}`);
+    logInfo.error++;
 }
 window.addEventListener('unhandledrejection', function (e) {
     log("error", e.reason);
+    logInfo.error++;
 });
 
 window.addEventListener('beforeunload', (e) => {

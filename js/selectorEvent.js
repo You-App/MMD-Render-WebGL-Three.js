@@ -59,20 +59,17 @@ function barSwich(e, element){
     }
 }
 document.querySelector("#graph-render-option").addEventListener("change", (e) => {
-    var {target} = e;
     if(!window.renderFrame) return;
-    if(target.id == "graph-render-qualiti"){
-        window.renderFrame.renderOption.quality = target.value;
-        renderOption.quality = target.value;
-    }
-    if(target.id == "graph-render-qualiti-plus"){
-        window.renderFrame.renderOption.plus = target.value;
-        renderOption.plus = target.value;               
-    }
-    if(target.id == "graph-render-ratio"){
-        window.renderFrame.renderOption.ratio = target.value;
-        renderOption.ratio = target.value;
-    }
+    let p = document.querySelector("#graph-render-option");
+    let qualiti = p.querySelector("#graph-render-qualiti").value;
+    let plus = p.querySelector("#graph-render-qualiti-plus").value;
+    let ratio = p.querySelector("#graph-render-ratio").value;
+    window.renderFrame.renderOption.quality = qualiti;
+        renderOption.quality = qualiti;
+    window.renderFrame.renderOption.plus = plus;
+        renderOption.plus = plus;               
+    window.renderFrame.renderOption.ratio = ratio;
+        renderOption.ratio = ratio;
     window.renderFrame.onWindowResize();
 });
 document.querySelector(".time-control").addEventListener("click", (e)=>{
@@ -117,8 +114,8 @@ document.querySelector(".time-control").addEventListener("click", (e)=>{
         let value = tar.innerText * 1;
         var {duration} = getTimeAnimation(selection.model[0].url);
         let time = duration * (value/100);
-        setTimeForCam(time);
         setTimeForAnimate(selection.model[0].url, time);
+        setTimeForCam(time);
 
     }
 });
@@ -148,6 +145,10 @@ document.querySelector(".top-bar-list").addEventListener("click", async (e) => {
     if (target.classList[0] == "top-select") {
         if (target.classList[1] == "open-drop-menu") {
             let a = document.querySelector(".file-drop-menu");
+            a.style.display == "block" ? a.style.display = "" : a.style.display = "block";
+        }
+        if (target.classList[1] == "open-mini-info") {
+            let a = document.querySelector(".info-menu");
             a.style.display == "block" ? a.style.display = "" : a.style.display = "block";
         }
         
@@ -270,6 +271,7 @@ document.querySelector(".start-record").addEventListener("click", (e) => {
 document.addEventListener("click", (e) => {
     if (e.target.classList[0] !== "top-select") {
         document.querySelector(".file-drop-menu").style.display = "";
+        document.querySelector(".info-menu").style.display = "";
     }
 });
 

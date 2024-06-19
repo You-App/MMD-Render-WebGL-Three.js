@@ -5,8 +5,6 @@ var models = [
         name: "Furina P",
         pathName: "Genshin",
         src: "../lib/mmd/models/furina/1.pmx",
-        color: 0xdddddd,  /* maybe not use */
-        toneMappingExposure: 0.55,
         extension: [
             "../lib/mmd/models/furina/3.pmx", "../lib/mmd/models/furina/4.pmx",
             "../lib/mmd/models/furina/5.pmx", "../lib/mmd/models/furina/6.pmx",
@@ -20,37 +18,37 @@ var models = [
         name: "Furina O",
         pathName: "Genshin",
         src: "../lib/mmd/models/furina/2.pmx",
-        color: 0xdddddd,
-        toneMappingExposure: 0.55,
         extension: []
     },
     {
         name: "Hutao",
         pathName: "Genshin",
         src: "../lib/mmd/models/hutao/1.pmx",
-        color: 0xdddddd,
-        toneMappingExposure: 0.55,
         extension: []
     },
     {
         name: "Chiori",
         pathName: "Genshin",
         src: "../lib/mmd/models/chiori/chiori.pmx",
-        color: 0xdddddd,
-        toneMappingExposure: 0.55,
         extension: []
     },
     {
         name: "Navia",
         pathName: "Genshin",
         src: "../lib/mmd/models/navia/navia.pmx",
-        color: 0xdddddd,
-        toneMappingExposure: 0.55,
         extension: [
             "../lib/mmd/models/navia/2.pmx",
             "../lib/mmd/models/navia/3.pmx", 
             "../lib/mmd/models/navia/4.pmx",
             "../lib/mmd/models/navia/5.pmx",
+        ]
+    },
+    {
+        name: "Robin",
+        pathName: "HSR",
+        src: "../lib/mmd/models/robin/1.pmx",
+        extension: [
+            "../lib/mmd/models/robin/2.pmx",
         ]
     },
 ];

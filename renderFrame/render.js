@@ -76,17 +76,17 @@ function init() {
     scene.add(camera);
 
     dirLight = new THREE.DirectionalLight(0xffffff);
-    dirLight.position.set(30, 300, 400); // 75 300 -75
+    dirLight.position.set(30, 300, 300); // 75 300 -75
     scene.add(dirLight);
 
     window.directionalLight = new THREE.DirectionalLight(0xcccccc, 1);
-    directionalLight.position.set(-30, 300, -400);
+    directionalLight.position.set(-30, 300, -300);
     scene.add(directionalLight);
 
     renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
     renderer.setPixelRatio(1);
     renderer.toneMapping = THREE.ACESFilmicToneMapping; //
-    renderer.toneMappingExposure = 0.7; //
+    renderer.toneMappingExposure = 0.65; //
 
     container.appendChild(renderer.domElement);
 

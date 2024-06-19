@@ -284,7 +284,7 @@ window.loadAll = (e) => {
             if (window.top.isMobile) {
                 //if this site run on mobile device use this
                 moveCam = new OrbitControls(camera, renderer.domElement);
-                moveCam.position.set(0, 10, 10); // default pos
+                // moveCam.position.set(0, 10, 10); // default pos
             } else {
                 //if on pc/laptop use this to control with "WASD", "R" to swich to up speed, hold "C" to zoom
                 moveCam = new Move3d(camera, { speed: 50, fly: 0.55, position: [0, 9, 25] });

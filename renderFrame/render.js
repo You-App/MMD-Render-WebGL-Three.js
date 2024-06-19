@@ -13,7 +13,6 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 window.cam3d = null;
-window.data_file = file;
 window.scene = null;
 window.renderer  = null;
 window.effect = null;

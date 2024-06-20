@@ -4,6 +4,7 @@ import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
 import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Move3d } from '../js/move.js';
+
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 
@@ -15,7 +16,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // Global to use in parent window
 window.cam3d = null;
 window.scene = null;
-window.renderer  = null;
+window.renderer = null;
 window.effect = null;
 window.camera = null;
 window.mesh = null;
@@ -26,7 +27,7 @@ window.MtlLoader = null;
 window.dirLight = null;
 window.hemiLight = null;
 window.moveCam = null;
-window.TH = THREE;
+window.TH = THREE; //...
 window.composer = null;
 window.renderScene = null;
 window.bloomPass = null;
@@ -110,6 +111,7 @@ function init() {
     loader = new MMDLoader();
     ObjLoader = new OBJLoader();
     MtlLoader = new MTLLoader();
+    
     onWindowResize();
     window.addEventListener('resize', onWindowResize);
     window.addEventListener("keydown", (e) => {
@@ -128,6 +130,7 @@ function init() {
             }
         }
     });
+    
     window.top.renderFrame = window;
     if(window.top.res){
         window.top.res();
@@ -187,6 +190,7 @@ window.addMesh = (url, data) => {
             CUSTOM = window.top.addFile[position];
         }
         _loading.all++;
+        
         loader.load(url, (m) => {
             window.top.log("ok", `| Complete (model): ${url}`);
             m.name = name;
@@ -211,6 +215,7 @@ window.addMesh = (url, data) => {
         }, undefined, CUSTOM);
     }
 }
+
 window.addMap = (url, name) => {
     if(!ready) return;
     if (all_map[url]) {
@@ -224,6 +229,7 @@ window.addMap = (url, name) => {
         }
         _loading.all++;
         var fromName = name.previousElementSibling.previousElementSibling.innerText;
+        
         if((url.indexOf(".obj") !== -1 && url.indexOf(".mtl") !== -1) || (name.dataset.pos && fromName.endsWith(".obj"))){
             let urls = url.split(" && ");
             loadObjMtl(urls[1], urls[0], (gr) => {
@@ -259,6 +265,7 @@ window.loadAll = (e) => {
     var k = selection.model.length + selection.camera.length + selection.vmd.length + selection.map.length;
     _loading.all = k;
     loadModel();
+    
     function loadModel(){
         let {url, name, position, element} = selection.model[index];
         var CUSTOM;
@@ -477,6 +484,7 @@ window.onWindowResize = () => {
 window.animate = function () {
     window.requestAnimationFrame(animate);
     render();
+    
     for (let i = 0; i < window.callAnimate.length; i++) {
         const f = window.callAnimate[i];
         if (!f) continue;
@@ -518,6 +526,7 @@ function render() {
     } else{
         return;
     }
+    
     composer.render(t);
     // camera.updateProjectionMatrix();
     if(window.moveCam){

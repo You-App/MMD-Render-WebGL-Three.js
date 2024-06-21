@@ -76,6 +76,9 @@ function init() {
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
     scene.add(camera);
 
+    window.ambient = new THREE.AmbientLight(0x404040); 
+    scene.add(ambient);
+    
     dirLight = new THREE.DirectionalLight(0xffffff);
     dirLight.position.set(30, 300, 300); // 75 300 -75
     scene.add(dirLight);

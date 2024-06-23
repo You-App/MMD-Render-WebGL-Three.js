@@ -8,8 +8,8 @@
 - Defect: using it on mobile is quite difficult (fix later)
 - +Some model error or not displayed properly, colors are pale
 - Image:
-![Demo-1](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/219db686-7c24-42db-b2ab-e126bad625bc)
-7680x2160 image 
+![Screenshot 2024-06-21 11 22 15 PM](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/99f49825-debc-4611-9e6f-f292e3864574)
+7680x2160 image (Graph -> qualiti: 1080 qualiti +: 2.0 ratio: 16/9)
 ![MMD renderer - 1716542995436](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/3139f90a-71ad-4ab0-b086-acc05507623f)
 Multi object
 ![MMD renderer - 1716638772678](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/bb96b4a8-598d-47a3-a750-e45738c3b85e)

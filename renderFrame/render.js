@@ -109,7 +109,15 @@ function init() {
     composer.addPass( outputPass );
 
 
-    // effect = new OutlineEffect(renderer);
+    effect = new OutlineEffect(renderer);
+    let renderingOutline = false;
+    scene.onAfterRender = function () {
+  	  if ( renderingOutline ) return;
+  	  renderingOutline = true;
+  	  effect.renderOutline( scene, camera );
+  	  renderingOutline = false;
+    };
+    
     helper = new MMDAnimationHelper({ pmxAnimation: true });
     loader = new MMDLoader();
     ObjLoader = new OBJLoader();

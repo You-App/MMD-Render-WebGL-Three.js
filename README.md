@@ -18,4 +18,5 @@ Try to add bloom (fail)
 Unkown why error in r165 but r158 not
 ![Screenshot 2024-06-05 3 56 22 PM](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/8b714663-bce0-4de5-8fb7-73f04f780448)
 + Lazy to update 
-+ Maybe add obj and mtl loader
++ Maybe add obj and mtl loader (ok but not good)
++ Next time add audio and optimize opening of zip file, ui on mobile

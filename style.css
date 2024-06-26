@@ -1,11 +1,14 @@
+/*
+chaos css :/
+*/
 :root{
     --background: #000;
     --color: #fff;
     --light: #00ffff;
     --top-bar: 25px;
     --bottom-bar: 25px;
-    --left-menu: 25%;
-    --right-menu: 20%;
+    --left-menu: 27%;
+    --right-menu: 22%;
     --border-size: 2px;
     --border-color: #ddd;
     --border-type: solid;

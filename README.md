@@ -7,7 +7,7 @@
 - First is model file, second is camera file, third is dance file, fourth is background file
 - Click to file name and click "<" to select it (or double click to fast select), after select click "load all" and wait
 - Defect: using it on mobile is quite difficult (fix later)
-- +Some model error or not displayed properly, colors are pale
+- +Some model error or not displayed properly, colors are pale (fixed: change to LinearEncoding)
 - Image:
 ![Screenshot 2024-06-21 11 22 15 PM](https://github.com/anhhao00777/MMD-Render-WebGL-Three.js/assets/106489200/99f49825-debc-4611-9e6f-f292e3864574)
 7680x2160 image (Graph -> qualiti: 1080 qualiti +: 2.0 ratio: 16/9)

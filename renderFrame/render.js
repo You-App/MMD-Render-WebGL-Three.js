@@ -91,6 +91,7 @@ function init() {
     renderer.setPixelRatio(1);
     renderer.toneMapping = THREE.ACESFilmicToneMapping; //
     renderer.toneMappingExposure = 1.1; //
+    renderer.outputEncoding = THREE.LinearEncoding; // default is sRGBEncoding and color not ok
 
     container.appendChild(renderer.domElement);
 

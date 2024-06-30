@@ -90,7 +90,7 @@ function init() {
     renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
     renderer.setPixelRatio(1);
     renderer.toneMapping = THREE.ACESFilmicToneMapping; //
-    renderer.toneMappingExposure = 0.65; //
+    renderer.toneMappingExposure = 1.1; //
 
     container.appendChild(renderer.domElement);
 

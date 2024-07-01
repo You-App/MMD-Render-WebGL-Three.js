@@ -1,1 +1,12 @@
 24/5/2024
+
+video demo is .webm convert to .mp4
+online web: https://cloudconvert.com/webm-to-mp4
+because in chrome not support mp4
+
+types:
+"video/mp4" - no
+"video/webm;codecs=daala" - no
+"video/webm;codecs=h264" - yes (good in webm type)
+"video/webm;codecs=vp8" - yes
+"video/webm" - yes

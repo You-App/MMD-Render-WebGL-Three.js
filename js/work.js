@@ -8,21 +8,25 @@ var meshView = document.querySelector("#mesh-view-option");
 var domAni = document.querySelector(".animation-time");
 var domCam = document.querySelector(".camera-time");
 var _sync = false;
+var focusPage = true;
 var modelFile;
 var cameraFile;
 var vmdFile;
 var mapFile;
+var audioFile;
 var res;
 var _meshManager;
 var selection = {
     model: [],
     camera: [],
     vmd: [],
-    map: []
+    map: [],
+    audio: [],
 };
 var addFile = {};
 var addFileMap = {};
 var addFileVmd = {};
+var addFileAudio = {};
 var renderOption = {
     quality: "auto",
     plus: "auto",
@@ -46,6 +50,7 @@ var config = {
         cam: "Camera (.vmd file) no select to use control</br>PC use 'wasd' mobile likely zoom",
         vmd: "Dance* (.vmd file)",
         obj: "Object 3d file (no animate):</br>.pmx | (.mtl + .obj)",
+        audio: "Audio file .mp3 | .wav ...",
     }
 }
 // leftTopSelect.addEventListener("click", (e) => {
@@ -103,8 +108,26 @@ function loadFileList() {
         anyChange();
     });
 
-    cameraFile = new FileControl(setUp, {file: window.file.camera, title: config.titles.cam});
+    cameraFile = new FileControl(setUp, {
+        file: window.file.camera, 
+        title: config.titles.cam,
+        addOnDrag: true,
+        dropTitle: ".vmd"
+    });
     cameraFile.create();
+    cameraFile.ondrop = (e) => {
+        if(e.dataTransfer.files){
+            for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                const s = e.dataTransfer.files[i];
+                if(!s.name.endsWith(".vmd")) continue;
+                cameraFile.addObject({
+                    name: s.name,
+                    url: URL.createObjectURL(s),
+                });
+            }
+        }
+        
+    }
     cameraFile.on("left", (url) => {
         selection.camera.push(url);
     });
@@ -118,8 +141,26 @@ function loadFileList() {
         }
     });
 
-    vmdFile = new FileControl(setUp, {file: window.file.vmd, title: config.titles.vmd});
+    vmdFile = new FileControl(setUp, {
+        file: window.file.vmd, 
+        title: config.titles.vmd,
+        addOnDrag: true,
+        dropTitle: ".vmd"
+    });
     vmdFile.create();
+    vmdFile.ondrop = (e) => {
+        if(e.dataTransfer.files){
+            for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                const s = e.dataTransfer.files[i];
+                if(!s.name.endsWith(".vmd")) continue;
+                vmdFile.addObject({
+                    name: s.name,
+                    url: URL.createObjectURL(s),
+                });
+            }
+        }
+        
+    }
     vmdFile.on("left", (url) => {
         selection.vmd.push(url);
     });
@@ -145,13 +186,31 @@ function loadFileList() {
         });
     }
 
-    mapFile = new FileControl(setUp, {file: decore, title: config.titles.obj});
+    mapFile = new FileControl(setUp, {
+        file: decore, 
+        title: config.titles.obj,
+        addOnDrag: true,
+        dropTitle: ".pmx | .obj"
+    });
     mapFile.name = "Object File";
     mapFile.create();
 
     modelFile.connect(mapFile);
     mapFile.connect(modelFile);
 
+    mapFile.ondrop = (e) => {
+        if(e.dataTransfer.files){
+            for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                const s = e.dataTransfer.files[i];
+                if(!s.name.endsWith(".pmx") && !s.name.endsWith(".obj")) continue;
+                mapFile.addObject({
+                    name: s.name,
+                    url: URL.createObjectURL(s),
+                });
+            }
+        }
+        
+    }
     mapFile.on("left", (url, e) => {
         selection.map.push({
             url: url,
@@ -181,6 +240,45 @@ function loadFileList() {
         }
         anyChange();
     });
+
+    audioFile = new FileControl(setUp, {
+        file: window.file.audio, 
+        title: config.titles.audio,
+        addOnDrag: true,
+        single: true,
+        dropTitle: ".mp3 | .wav"
+    });
+    audioFile.create();
+    audioFile.on("left", (url, e) => {
+        selection.audio.push({
+            url: url,
+            name: e.previousElementSibling.previousElementSibling.innerText,
+            position: e.dataset.pos,
+            element: e.previousElementSibling
+        });
+        anyChange();
+    });
+    audioFile.on("right", (url, e) => {
+        removeItem(selection.audio, {
+            url: url,
+            name: e.previousElementSibling.previousElementSibling.innerText,
+            position: e.dataset.pos
+        });
+        anyChange();
+    });
+    audioFile.ondrop = (e) => {
+        if(e.dataTransfer.files){
+            for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                const s = e.dataTransfer.files[i];
+                if(s.type.indexOf("audio/") == -1) continue;
+                audioFile.addObject({
+                    name: s.name,
+                    url: URL.createObjectURL(s),
+                });
+            }
+        }
+        
+    }
 }
 loadFileList()
 /**
@@ -304,7 +402,9 @@ function setTimeForAnimate(url, value = 0){
 function setTimeForCam(value = 0){
     let wd = window.renderFrame;
     let cam = wd.camera;
-    wd.helper.objects.get(cam).mixer._actions[0].time = value;
+    if(wd.helper.objects.get(cam)){
+        wd.helper.objects.get(cam).mixer._actions[0].time = value;
+    }
 }
 setInterval(() => {
     if(window.renderFrame){
@@ -320,6 +420,21 @@ setInterval(() => {
                 aniCurrent.innerText = timeToMin(secondsToTime(animate.currentTime));
                 aniDur.innerText = timeToMin(secondsToTime(animate.duration));
                 bar1.style.width = `${(animate.currentTime / animate.duration) * 100}%`;
+                if(focusPage){
+                    renderFrame.audioCtx.syncCheck(animate.currentTime, 2);
+                    if(renderFrame.audioCtx.audio.volume == 0){
+                        renderFrame.audioCtx.audio.volume = 1;
+                    }
+                } else{
+                    renderFrame.audioCtx.audio.volume = 0;
+                }
+                if(renderFrame.helper.enabled.animation && focusPage){
+                    if(renderFrame.audioCtx.audio.volume == 0){
+                        renderFrame.audioCtx.audio.volume = 1;
+                    }
+                } else{
+                    renderFrame.audioCtx.audio.volume = 0;
+                }
             }
             var cam = getTimeCamera();
             camCurrent.innerText = timeToMin(secondsToTime(cam.currentTime));
@@ -333,7 +448,12 @@ setInterval(() => {
     }
     let errs = document.querySelector(".-total-err");
     errs.innerText = `All Error: ${logInfo.error}`;
-}, 999);
+}, 500);
+setInterval(() => {
+    if(_meshManager && renderFrame){
+        _meshManager.updateRsPhysics(renderFrame.helper);
+    }
+}, 4000);
 function secondsToTime(e = 0) {
     if(!e) e = 0;
     const h = Math.floor(e / 3600).toString().padStart(2, '0'),
@@ -403,8 +523,13 @@ var erTime = 0;
  * @param {String | Number | undefined} type type: info | ok | warn | error 
  * @param {String} message out text
  */
-function log(type, message){
+function log(type, message = ""){
     var name = "log-info";
+    if(typeof message !== "string"){
+        console.warn("not string");
+        console.log(message);
+        return;
+    }
     if(type == "ok" || type == 1) name = "log-ok";
     if(type == "warn" || type == 2) name = "log-warn";
     if(type == "error" || type == 3) {
@@ -430,6 +555,12 @@ function log(type, message){
     if(all.length > 99) all[0].remove();
 }
 
+window.addEventListener("blur", () => {
+    focusPage = false;
+});
+window.addEventListener("focus", () => {
+    focusPage = true;
+});
 
 window.onerror = (mess, file, line, col, error) => {
     var a = file;
@@ -471,3 +602,5 @@ isMobile = mobileCheck();
     js.src = "js/selectorEvent.js";
     document.body.appendChild(js);
 })();
+console.log("%c Welcome to console", 'color: #00ffff; font-size: 2em');
+console.log("%c Dont know but variable are not global here (github page)", 'color: #00ffff;');

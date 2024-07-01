@@ -55,7 +55,7 @@ var models = [
 
 var vmd = [
     {
-        name: "default",
+        name: "wavefile",
         src: "../lib/mmd/vmd/1/wavefile_v2.vmd"
     },
     {
@@ -70,7 +70,7 @@ var vmd = [
 
 var camera = [
     {
-        name: "default",
+        name: "wavefile",
         src: "../lib/mmd/camera/1/wavefile_camera.vmd"
     },
     {
@@ -91,4 +91,26 @@ var _bg = [
     },
 ];
 
-export {models, vmd, camera, _bg}
+
+var audio = [
+    {
+        name: "wavefile",
+        src: "../lib/mmd/audio/wavefile_short.mp3"
+    },
+    {
+        name: "Super Idol",
+        src: "../lib/mmd/audio/idol.mp3"
+    },
+    {
+        name: "Everyone are know",
+        src: "../lib/mmd/audio/neverggyu.mp3"
+    },
+    {
+        name: "Test file",
+        src: "../lib/mmd/audio/ms_1.mp3"
+    }
+    
+];
+
+
+export {models, vmd, camera, _bg, audio}

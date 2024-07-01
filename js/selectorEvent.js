@@ -1,3 +1,4 @@
+// Just element.addEventListener 
 
 loadbtn.addEventListener("click", ()=>{
     let wait = new Promise((resolve, reject) => {
@@ -12,7 +13,7 @@ loadbtn.addEventListener("click", ()=>{
             meshView.innerHTML = "";
             _meshManager = new MeshManager(meshView, wd.scene);
             setUpManager(_meshManager);
-            record = new RecordVideo(renderFrame.renderer.domElement);
+            record = new RecordVideo(renderFrame.renderer.domElement, renderFrame.audioCtx.audio);
             document.querySelector(".record-canvas").style.opacity = "1";
         }
     });
@@ -28,6 +29,7 @@ domAni.querySelector(".bar-progress").addEventListener("click", (e) =>{
     var time = getTimeAnimation(selection.model[0].url);
     var value = per * time.duration;
     setTimeForAnimate(selection.model[0].url, value);
+    renderFrame.audioCtx.play(value)
     if(_sync === true){
         setTimeForCam(value);
     }
@@ -43,7 +45,12 @@ domCam.querySelector(".bar-progress").addEventListener("click", (e) =>{
     var value = per * time.duration;
     setTimeForCam(value);
     if(_sync === true){
-        setTimeForAnimate(selection.model[0].url, value);
+        for (let i = 0; i < selection.model.length; i++) {
+            const e = selection.model[i];
+            var { duration } = getTimeAnimation(e.url);
+            let time = duration * (value / 100);
+            setTimeForAnimate(e.url, time);
+        }
     }
 });
 document.querySelector(".right-menu > .rt-container").addEventListener("click", (e) => {barSwich(e, document.querySelector(".right-menu > .rt-container"))});
@@ -72,6 +79,22 @@ document.querySelector("#graph-render-option").addEventListener("change", (e) =>
         renderOption.ratio = ratio;
     window.renderFrame.onWindowResize();
 });
+document.querySelector(".reload-all-style").addEventListener("click", () => {
+    let list = document.querySelectorAll(`link[rel="stylesheet"]`);
+    let reload = [];
+    list.forEach(e => {
+        if(e.href) reload.push(e);
+    });
+    log("ok", `Reload ${reload.length} CSS`);
+    reload.forEach(e => {
+        let url = e.href;
+        e.remove();
+        let el = document.createElement("link");
+        el.rel = "stylesheet";
+        el.href = url;
+        setTimeout(() => { document.head.appendChild(el) }, 11);
+    });
+});
 document.querySelector(".time-control").addEventListener("click", (e)=>{
     var tar = e.target;
     if (tar.classList[0] == "cs-btn") {
@@ -81,9 +104,11 @@ document.querySelector(".time-control").addEventListener("click", (e)=>{
                     let enabled = renderFrame.helper.enabled.animation;
                     if(enabled){
                         renderFrame.helper.enabled.animation = false;
+                        renderFrame.audioCtx.pause();
                         tar.innerText = "Play"
                     } else{
                         renderFrame.helper.enabled.animation = true;
+                        renderFrame.audioCtx.play();
                         tar.innerText = "Pause"
                     }
                 }
@@ -112,10 +137,14 @@ document.querySelector(".time-control").addEventListener("click", (e)=>{
 
     if (tar.parentElement.className == "time-sync") {
         let value = tar.innerText * 1;
-        var {duration} = getTimeAnimation(selection.model[0].url);
-        let time = duration * (value/100);
-        setTimeForAnimate(selection.model[0].url, time);
-        setTimeForCam(time);
+        for (let i = 0; i < selection.model.length; i++) {
+            const e = selection.model[i];
+            var { duration } = getTimeAnimation(e.url);
+            let time = duration * (value / 100);
+            setTimeForAnimate(e.url, time);
+            setTimeForCam(time);
+        }
+        
 
     }
 });
@@ -213,7 +242,7 @@ document.querySelector(".file-drop-menu").addEventListener("click", async (e) =>
 
             }
         }
-        if (target.classList[1] == "open-zip-mode-file-cam") {
+        if (target.classList[1] == "open-file-cam") {
             file = await getHanderFile();
             if (file.name.endsWith(".vmd")) {
                 cameraFile.addObject({
@@ -222,12 +251,30 @@ document.querySelector(".file-drop-menu").addEventListener("click", async (e) =>
                 });
             }
         }
-        if (target.classList[1] == "open-zip-mode-file-mot") {
+        if (target.classList[1] == "open-file-mot") {
             file = await getHanderFile();
             if (file.name.endsWith(".vmd")) {
                 vmdFile.addObject({
                     name: file.name,
                     url: URL.createObjectURL(file)
+                });
+            }
+        }
+        if (target.classList[1] == "open-file-obj") {
+            file = await getHanderFile();
+            if (file.name.endsWith(".obj")) {
+                mapFile.addObject({
+                    name: file.name,
+                    url: URL.createObjectURL(file),
+                });
+            }
+        }
+        if (target.classList[1] == "open-file-audio") {
+            file = await getHanderFile();
+            if (file.type.indexOf("audio/") !== -1) {
+                audioFile.addObject({
+                    name: file.name,
+                    url: URL.createObjectURL(file),
                 });
             }
         }

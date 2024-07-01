@@ -10,6 +10,7 @@
             color: #c6c6c6;
             background: #00000000;
             margin: 0;
+            user-select: none;
         }
 
         .loadd {
@@ -89,7 +90,73 @@
             height: 100%;
             position: absolute;
         }
+        .control-ui{
+            display: none;
+        }
+        .bottom-tips{
+            position: fixed;
+            z-index: 9;
+            bottom: 0;
+            left: 0;
+            height: 28px;
+            width: 100%;
+            background-color: #00000080;
+            font-size: 1.2em;
+        }
+        .lock-menu{
+            position: fixed;
+            z-index: 10;
+            right: 0;
+            top: 0;
+            border: 2px solid #ddd;
+            color: #fff;
+            background-color: #00000090;
+            user-select: none;
+            display: none;
+        }
+        .menu{
+            position: relative;
+            padding: 3px 10px;
+        }
+        .item-menu{
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin: 3px;
+            border: 2px solid transparent;
+        }
+        .option-name{
+            padding-right: 15px;
+            
+        }
+        .option-value{
+            padding: 0px 5px;
+        }
+        .option-value::before{
+            content: '<';
+            padding: 0px 5px;
+        }
+        .option-value::after{
+            content: '>';
+            padding: 0px 5px;
+        }
+        .option-name::after {
+            content: ':';
+        }
+        .-ct-selected {
+            color: #00ffff;
+            border-color: #00ffff;
+        }
+        .-ct-no-use{
+            opacity: .6;
+            color: #aaaaaa;
+        }
+        .-ct-selected.-ct-no-use{
+            border-color: #ffa806 !important;
+        }
     </style>
+    <script src="../js/help.js"></script>
 </head>
 
 <body>
@@ -101,6 +168,43 @@
             }
         }
     </script>
+    <div class="control-ui">
+        <div class="lock-menu">
+            <div class="menu">
+                <div class="item-menu -ct-selected" id="-i-menu-animate">
+                    <div class="option-name">Animation</div>
+                    <div class="option-value">true</div>
+                </div>
+                <div class="item-menu" id="-i-menu-cam">
+                    <div class="option-name">Camera Animation</div>
+                    <div class="option-value">true</div>
+                </div>
+                <div class="item-menu" id="-i-menu-physic">
+                    <div class="option-name">Physic</div>
+                    <div class="option-value">true</div>
+                </div>
+                <div class="item-menu" id="-i-menu-speed">
+                    <div class="option-name">Move Speed</div>
+                    <div class="option-value">50</div>
+                </div>
+                <div class="item-menu" id="-i-menu-fly">
+                    <div class="option-name">Fly Speed</div>
+                    <div class="option-value">0.5</div>
+                </div>
+                <div class="item-menu" id="-i-menu-fov">
+                    <div class="option-name">FOV</div>
+                    <div class="option-value">45</div>
+                </div>
+                <div class="item-menu" id="-i-menu-far">
+                    <div class="option-name">Far</div>
+                    <div class="option-value">2000</div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-tips">
+            <div>"WASD" - move || "R" - swich to speed/normal || "Shift" - Fly down || "Space" - Fly up || Hold "C" - zoom || "M" - menu</div>
+        </div>
+    </div>
     <script src="../lib/three/jsm/libs/ammo.wasm.js"></script>
     <script type="module" src="render.js"></script>
 

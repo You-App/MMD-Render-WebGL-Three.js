@@ -2,7 +2,7 @@
 
 video demo is .webm convert to .mp4
 online web: https://cloudconvert.com/webm-to-mp4
-because in chrome not support mp4
+because chrome not support mp4
 
 types:
 "video/mp4" - no
@@ -10,3 +10,7 @@ types:
 "video/webm;codecs=h264" - yes (good in webm type)
 "video/webm;codecs=vp8" - yes
 "video/webm" - yes
+
+- why video ~10fps: Intel(R) Celeron(R) CPU N3160 @ 1.60GHz (4 core, 2.24 GHz)
+                  + Ram 4 GB
+                  + OS: ChromeOs

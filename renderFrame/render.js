@@ -16,6 +16,8 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // import { OutlinePass } from '../../jsm/postprocessing/OutlinePass.js'; // not use
 
 // Global to use in parent window
+window.THREE = THREE; // global module to debug 
+
 window.cam3d = null;
 window.scene = null;
 window.renderer  = null;

@@ -602,5 +602,18 @@ isMobile = mobileCheck();
     js.src = "js/selectorEvent.js";
     document.body.appendChild(js);
 })();
-console.log("%c Welcome to console", 'color: #00ffff; font-size: 2em');
-console.log("%c Dont know but variable are not global here (github page)", 'color: #00ffff;');
+
+// info
+function infoCheck(){
+    console.log("%c ________________", 'color: #ff0000; font-size: 2em');
+    console.log("%c __Test console__", 'color: #00ffff; font-size: 2em');
+    console.log("%c Do anything you want", 'color: #00ff00');
+    console.log("%c Go here to check global variable and value: https://github.com/anhhao00777/MMD-Render-WebGL-Three.js", 'color: #00ff00');
+    console.log("%c Main window:", 'color: #00ff00');
+    console.log(window);
+    console.log("%c Sup window - variable name: renderFrame", 'color: #00ff00');
+    console.log(window.renderFrame);
+    console.log("%c ________________", 'color: #ff0000; font-size: 2em');
+}
+console.log("%c Welcome to console", 'color: #00ffff; font-size: 2.5em; background-color: #00dd00');
+console.log("%c Dont know but variable maybe not global type 'infoCheck()' and call to check - make sure focus main window in console", 'color: #00ffff;');

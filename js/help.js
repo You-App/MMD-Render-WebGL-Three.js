@@ -165,11 +165,11 @@ class FileControl{
         .mor-value{ border: 1px solid #ddd; position: relative; width: 100%; height: 20px; }
         .mor-value > div{ position: absolute; top: 0; width: 5px; height: 100%; background-color: #00ffff; left: 20px; }
         .mmd-container { position: absolute; left: 0; top: 40px; width: 100%; height: calc(100% - 40px); display: flex; flex-direction: row; flex-wrap: wrap; user-select: none; overflow-y: scroll; background: #000000d3; }
-        .mmd-block { position: relative; width: 475px; height: 240px; border: 1px solid #ddd; display: flex; flex-direction: row; margin: 5px; }
+        .mmd-block { position: relative; width: 480px; height: 245px; border: 1px solid #ddd; display: flex; flex-direction: row; margin: 5px; }
         .big-block{ width: 600px; }
         .m-box { position: relative; width: calc(50% - 15px); height: 100%; overflow-y: scroll; display: flex; flex-direction: column; }
         .mid-control { position: relative; width: 30px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .mid-ct-btn { font-size: 2em; border: 1px solid #ddd; width: 28px; text-align: center; margin: 4px 0px 4px 0px; }
+        .mid-ct-btn { font-size: 1.9em; border: 1px solid #ddd; width: 28px; text-align: center; margin: 4px 0px 4px 0px; }
         .mid-ct-btn:hover { border: 1px solid #00ffff; color: #00ffff; }
         .mmd-box-left { border-right: 1px solid #ddd; }
         .mmd-box-right { border-left: 1px solid #ddd; }

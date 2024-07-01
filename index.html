@@ -31,8 +31,10 @@
                         <div class="item-box-menu open-zip-mode">Open Zip (To Model)</div>
                         <div class="item-box-menu open-zip-mode-vmd">Open Zip (To VMD)</div>
                         <div class="item-box-menu open-zip-mode-map">Open Zip (To Map)</div>
-                        <div class="item-box-menu open-zip-mode-file-cam">Open File vmd (camera)</div>
-                        <div class="item-box-menu open-zip-mode-file-mot">Open File (motion)</div>
+                        <div class="item-box-menu open-file-cam">Open File vmd (camera)</div>
+                        <div class="item-box-menu open-file-mot">Open File (motion)</div>
+                        <div class="item-box-menu open-file-obj">Open File (.obj)</div>
+                        <div class="item-box-menu open-file-obj">Open File (audio)</div>
 
                     </div>
                     <div class="menu-box info-menu">
@@ -75,16 +77,16 @@
                             </div>
                             <div class="time-control">
                                 <div class="pri-control">
-                                    <div class="cs-btn play-mode" title="Play/Pause Animation">Pause</div>
-                                    <div class="cs-btn play-sync">Sync</div>
-                                    <div class="cs-btn get-render-image">Screenshot</div>
+                                    <div class="cs-btn play-mode" role="button" title="Play/Pause Animation">Pause</div>
+                                    <div class="cs-btn play-sync" role="button">Sync</div>
+                                    <div class="cs-btn get-render-image" role="button">Screenshot</div>
                                 </div>
                                 <div class="sec-control">
                                     <div class="time-sync">
-                                        <div>00</div>
-                                        <div>25</div>
-                                        <div>50</div>
-                                        <div>75</div>
+                                        <div role="button">00</div>
+                                        <div role="button">25</div>
+                                        <div role="button">50</div>
+                                        <div role="button">75</div>
                                     </div>
                                 </div>
                             </div>
@@ -95,7 +97,7 @@
                             </div>
                             <div class="camera-control">
                                 <div class="pri-control">
-                                    <div class="cs-btn play-mode" title="Play/Pause Camera Animation">Pause</div>
+                                    <div class="cs-btn play-mode" role="button" title="Play/Pause Camera Animation">Pause</div>
                                 </div>
                                 <div class="sec-control">
                                     
@@ -165,7 +167,9 @@
                                     <option value="32:9">32:9</option>
                                     <option value="auto" selected>auto</option>
                                 </select>
-
+                                
+                                <h2>For dev:</h2>
+                                <div class="cs-btn reload-all-style">Reload CSS</div>
 
                             </div>
                         </div>

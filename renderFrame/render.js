@@ -423,7 +423,8 @@ window.loadAll = (e) => {
                     if (tur < selection.map.length) {
                         LoadBg();
                     } else {
-                        addAll();
+                        loadAudio();
+                        // addAll();
                     }
                 });
             } else if(url.indexOf(".obj") !== -1 || (position && name.endsWith(".obj"))){
@@ -457,7 +458,9 @@ window.loadAll = (e) => {
                     if (tur < selection.map.length) {
                         LoadBg();
                     } else {
-                        addAll();
+                        // addAll();
+                        loadAudio();
+
                     }
                 }, (e) => {
                     loading(e, "map/object");

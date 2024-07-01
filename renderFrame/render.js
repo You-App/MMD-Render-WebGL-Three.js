@@ -251,7 +251,7 @@ window.addMesh = (url, data) => {
 }
 
 window.addMap = (url, name) => {
-    // if(!ready) return;
+    if(!ready) return;
     if (all_map[url]) {
         scene.add(all_map[url]);
     } else {

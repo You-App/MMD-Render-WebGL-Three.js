@@ -615,5 +615,5 @@ function infoCheck(){
     console.log(window.renderFrame);
     console.log("%c ________________", 'color: #ff0000; font-size: 2em');
 }
-console.log("%c Welcome to console", 'color: #00ffff; font-size: 2.5em; background-color: #00dd00');
+console.log("%c Welcome to console", 'color: #00ffff; font-size: 2.5em; background-color: #009000');
 console.log("%c Dont know but variable maybe not global type 'infoCheck()' and call to check - make sure focus main window in console", 'color: #00ffff;');

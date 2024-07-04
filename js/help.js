@@ -367,12 +367,12 @@ class MeshManager{
         this.mesh = this.getMesh(this.scene);
         var htName = "";
         var htMesh = "";
-        var htMorph = "";
+        
         for (let i = 0; i < this.mesh.length; i++) {
             const e = this.mesh[i];
             htName += `<div class="mesh-item" role="button" data-id="${e.uuid}" title="${e.name}">${e.name}</div>`;
             var htMaterial = "";
-
+            var htMorph = "";
             for (let k = 0; k < e.material.length; k++) {
                 const m = e.material[k];
                 htMaterial += this._getHtmlMaterial({uuid: e.uuid, k, name: m.name});
@@ -442,11 +442,11 @@ class MeshManager{
 
         var htName = "";
         var htMesh = "";
-        var htMorph = "";
         for (let i = 0; i < needAdd.length; i++) {
             const e = needAdd[i];
             htName += `<div class="mesh-item" role="button" data-id="${e.uuid}" title="${e.name}">${e.name}</div>`;
             var htMaterial = "";
+            var htMorph = "";
             if (!e.material) {
                 htMesh += this._getHtmlCont({ htMaterial, e });
             continue;
@@ -533,7 +533,6 @@ class MeshManager{
         function c(value){ return value ? value : 0 }
     }
     updateMorph(meshs){
-        'use strict';
         if (!Array.isArray(meshs)){
             meshs = [meshs];
         }

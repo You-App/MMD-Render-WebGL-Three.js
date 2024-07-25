@@ -1,4 +1,3 @@
-// Just element.addEventListener 
 
 loadbtn.addEventListener("click", ()=>{
     let wait = new Promise((resolve, reject) => {
@@ -71,12 +70,35 @@ document.querySelector("#graph-render-option").addEventListener("change", (e) =>
     let qualiti = p.querySelector("#graph-render-qualiti").value;
     let plus = p.querySelector("#graph-render-qualiti-plus").value;
     let ratio = p.querySelector("#graph-render-ratio").value;
+    let fps = p.querySelector("#graph-render-fps").value;
+    let outline = p.querySelector("#graph-render-outline").value;
+    let shadow = p.querySelector("#graph-render-shadow").value;
+    let colorSpace = p.querySelector("#graph-render-colorspace").value;
+    let mapping = p.querySelector("#graph-render-mapping").value;
+    let ex = p.querySelector("#graph-render-tone-ex").valueAsNumber;
+    let light = p.querySelector("#graph-render-light").value*1;
+    
     window.renderFrame.renderOption.quality = qualiti;
         renderOption.quality = qualiti;
     window.renderFrame.renderOption.plus = plus;
         renderOption.plus = plus;               
     window.renderFrame.renderOption.ratio = ratio;
         renderOption.ratio = ratio;
+    window.renderFrame.renderOption.fps = fps == "max" ? true : fps*1;
+        renderOption.fps = fps == "max" ? true : fps*1;
+    window.renderFrame.renderOption.outline = !!outline;
+        renderOption.outline = !!outline;
+    window.renderFrame.renderOption.shadow = !!shadow;
+        renderOption.shadow = !!shadow;
+    window.renderFrame.renderOption.colorSpace = colorSpace;
+        renderOption.colorSpace = colorSpace;
+    window.renderFrame.renderOption.toneMapping = window.renderFrame.THREE[mapping];
+        renderOption.toneMapping = window.renderFrame.THREE[mapping];
+    window.renderFrame.renderOption.toneMappingExposure = ex;
+        renderOption.toneMappingExposure = ex;
+    window.renderFrame.renderOption.light = light;
+        renderOption.light = light;
+    window.renderFrame.changeLight(light);
     window.renderFrame.onWindowResize();
 });
 document.querySelector(".reload-all-style").addEventListener("click", () => {

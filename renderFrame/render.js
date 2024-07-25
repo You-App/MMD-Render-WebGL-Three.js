@@ -31,6 +31,7 @@ window.MtlLoader = null;
 window.dirLight = null;
 window.hemiLight = null;
 window.moveCam = null;
+window.THREE = THREE;
 window.composer = null;
 window.renderScene = null;
 window.bloomPass = null;
@@ -39,8 +40,13 @@ window.outlinePass = null;
 window.audioCtx = null;
 window.addif = false;
 window.delta = 0;
+//test for new idea in future
+if (addif) {
+    import("/bk/beta/animation/build/three.module.min.js").then((mod2) => {
+        console.log(mod2); 
+    });
 
-
+}
 window.bloom = {
     threshold: 0.7,
     strength: 0.7,
@@ -50,7 +56,15 @@ window.bloom = {
 window.renderOption = {
     quality: "auto",
     plus: "auto",
-    ratio: "auto"
+    ratio: "auto",
+    fps: true,
+    outline: true,
+    toneMappingExposure: 1.1,
+    toneMapping: THREE.ACESFilmicToneMapping,
+    colorSpace: THREE.LinearSRGBColorSpace,
+    toneMapping: THREE.ACESFilmicToneMapping,
+    shadow: true,
+    light: 1
 }
 window.moveConfig = {
     speed: 5,
@@ -64,8 +78,12 @@ window.physicConfig = {
     maxStepNum: 2,
     gravity: new THREE.Vector3(0, -90, 0)
 }
+window.runner = new AnimationRunner(true, true);
+window.valManager = new ValueManager();
 window.ready = false;
 window.callAnimate = [];
+window.lights = {};
+window.lightsCustom = {};
 window.clock = new THREE.Clock();
 var _loading = {load:0, all: 0}
 window.all_mesh = {};
@@ -75,17 +93,55 @@ window.all_map = {};
 window.all_audio = {};
 window.all_cam = null;
 
-var checkTime = 0;
-var fps = 0;
-var cmt = "===================="; // :v
+var cmt = "====================";
 Ammo().then(function () {
     init();
     render();
 });
 
+function lightSetUp(){
+    lights.ambient = new THREE.AmbientLight(0x404040);
+    let col = renderOption.light === 1 ? 0xeeeeee : 0x0000ff;
+    lights.dirLight = new THREE.DirectionalLight(col);
+    lights.dirLight.position.set(30, 300, 20); // 75 300 -75
+    lights.dirLight.castShadow = true;
+    lights.dirLight.shadow.camera.scale.set(2,2,2);
+
+    lights.directionalLight = new THREE.DirectionalLight(0xeeeeee, 1);
+    lights.directionalLight.position.set(-30, 300, -400);
+
+    scene.add(lights.ambient);
+    scene.add(lights.dirLight);
+    scene.add(lights.directionalLight);
+
+    lights.spotLight = new THREE.SpotLight(0xf6ffc6, 100);
+    lights.spotLight.position.set(0, 40, 30);
+    lights.spotLight.angle = 0.7; // 0.5 - 1
+    lights.spotLight.penumbra = 1;
+    lights.spotLight.decay = 0.8; //min
+    lights.spotLight.distance = 0;
+    lights.spotLight.intensity = 40;
+    // lights.spotLight.map = texture2;
+
+    lights.spotLight.castShadow = true;
+    lights.spotLight.shadow.mapSize.width = 1024;
+    lights.spotLight.shadow.mapSize.height = 1024;
+    lights.spotLight.shadow.camera.near = 1;
+    lights.spotLight.shadow.camera.far = 100;
+    lights.spotLight.shadow.camera.updateProjectionMatrix();
+    lights.spotLight.shadow.focus = 1;
+    if (renderOption.light === 2) {
+        bloomPass.enabled = false;
+        scene.add(lights.spotLight);
+    }
+}
+
 function init() {
     if(window.top.renderOption){
-        window.renderOption = window.top.renderOption;
+        window.renderOption = structuredClone(window.top.renderOption);
+        renderOption.toneMapping = THREE[renderOption.toneMapping];
+        renderOption.colorSpace = THREE[renderOption.colorSpace];
+        renderOption.toneMapping = THREE[renderOption.toneMapping];
     }
 
     const container = document.createElement('div');
@@ -97,21 +153,20 @@ function init() {
 
     scene.add(camera);
 
-    window.ambient = new THREE.AmbientLight(0x505050);
-    scene.add(ambient);
-    dirLight = new THREE.DirectionalLight(0xffffff);
-    dirLight.position.set(30, 300, 400); // 75 300 -75
-    scene.add(dirLight);
-
-    window.directionalLight = new THREE.DirectionalLight(0xcccccc, 1);
-    directionalLight.position.set(-30, 300, -400);
-    scene.add(directionalLight);
 
     renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
     renderer.setPixelRatio(1);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping; //
-    renderer.toneMappingExposure = 1.1; //
-    renderer.outputEncoding = THREE.LinearEncoding;
+    renderer.toneMapping = renderOption.toneMapping; //
+    renderer.toneMappingExposure = renderOption.toneMappingExposure; //
+    // renderer.outputEncoding = THREE.LinearEncoding;
+    renderer.outputColorSpace = renderOption.colorSpace;
+    renderer.shadowMap.enabled = true;
+
+    //auto update when value on option change
+    valManager.add(renderOption, "toneMapping", renderer, "toneMapping");
+    valManager.add(renderOption, "colorSpace", renderer, "outputColorSpace");
+    valManager.add(renderOption, "toneMappingExposure", renderer, "toneMappingExposure");
+    valManager.add(renderOption, "shadow", renderer.shadowMap, "enabled");
 
     container.appendChild(renderer.domElement);
 
@@ -131,11 +186,12 @@ function init() {
     composer.addPass(outputPass);
     // composer.addPass(outlinePass);
 
+    lightSetUp();
 
     effect = new OutlineEffect(renderer);
     let renderingOutline = false;
     scene.onAfterRender = function () {
-        if (renderingOutline) return;
+        if (renderingOutline || !renderOption.outline) return;
         renderingOutline = true;
         effect.renderOutline(scene, camera);
         renderingOutline = false;
@@ -146,15 +202,16 @@ function init() {
         afterglow: 2.0,
         sync: false
     });
-
     loader = new MMDLoader();
     ObjLoader = new OBJLoader();
     MtlLoader = new MTLLoader();
     audioCtx = new AudioCtx();
 
-    window.addCall(()=>{
+    runner.addCall(()=>{
         audioCtx.update(delta);
+        valManager.updateAll();
     });
+    valManager.add(renderOption, "fps", runner, "fps");
 
     onWindowResize();
     window.addEventListener('resize', onWindowResize);
@@ -179,7 +236,36 @@ function loadObjMtl(mtl, obj, callback, onProgress){
     });
 }
 //currentTimeAnimation
-//helper.objects.get(all_mesh['/src/mmd/model/blue_archive/mari_2/1.pmx']).mixer._actions[0].time
+//helper.objects.get(all_mesh['url']).mixer._actions[0].time
+
+window.changeLight = (type) => {
+    if(type === 1){
+        checkObj();
+        lights.dirLight.color.set(0xeeeeee);
+        scene.remove(lights.spotLight);
+        bloomPass.enabled = true;
+    } else if(type === 2){
+        checkObj();
+        lights.dirLight.color.set(0x0000ff);
+
+        scene.add(lights.spotLight);
+        bloomPass.enabled = false;
+    } else if(type === 0){
+        for (const key in lights) {
+            let value = lights[key];
+            scene.remove(value);
+        }
+    }
+    function checkObj(){
+        for (const key in lightsCustom) {
+            let value = lightsCustom[key];
+            scene.remove(value);
+        }
+        scene.add(lights.ambient);
+        scene.add(lights.dirLight);
+        scene.add(lights.directionalLight);
+    }
+}
 window.removeMesh = (url) => {
     if (all_mesh[url]) {
         all_mesh[url].pose();
@@ -226,6 +312,7 @@ window.addMesh = (url, data) => {
         loader.load(url, (m) => {
             window.top.log("ok", `| Complete (model): ${url}`);
             m.name = name;
+            m.castShadow = true;
             all_mesh[url] = m;
             loader.loadAnimation(window.top.selection.vmd, m, (mmd) => {
                 window.top.log("ok", `| Complete (animation): ${window.top.selection.vmd}`);
@@ -269,6 +356,7 @@ window.addMap = (url, name) => {
             loadObjMtl(urls[1], urls[0], (gr) => {
                 window.top.log("ok", `| Complete (map): ${url}`);
                 gr.name = fromName;
+                gr.receiveShadow = true;
                 all_map[url] = gr;
                 scene.add(gr);
                 _loading.load++;
@@ -281,6 +369,7 @@ window.addMap = (url, name) => {
                 window.top.log("ok", `| Complete (map): ${url}`);
                 e.name = fromName;
                 all_map[url] = e;
+                e.receiveShadow = true;
                 scene.add(e);
                 _loading.load++;
                 element.innerText = "Ok";
@@ -294,6 +383,7 @@ window.addMap = (url, name) => {
                 window.top.log("ok", `| Complete (map): ${url}`);
                 e.name = fromName;
                 all_map[url] = e;
+                e.receiveShadow = true;
                 scene.add(e);
                 _loading.load++;
                 load.innerText = "Ok";
@@ -331,6 +421,7 @@ window.loadAll = (e) => {
             index++;
             _loading.load++;
             m.name = name;
+            m.castShadow = true;
             all_mesh[url] = m;
             window.top.log("ok", `| Complete (model): ${url}`);
             element.innerText = "Ok";
@@ -419,14 +510,15 @@ window.loadAll = (e) => {
                     window.top.log("ok", `| Complete (map): ${url}`);
                     _loading.load += 2;
                     gr.name = name;
+                    gr.receiveShadow = true;
                     all_map[url] = gr;
                     tur++;
                     element.innerText = "Ok";
                     if (tur < selection.map.length) {
                         LoadBg();
                     } else {
-                        loadAudio();
                         // addAll();
+                        loadAudio();
                     }
                 });
             } else if(url.indexOf(".obj") !== -1 || (position && name.endsWith(".obj"))){
@@ -435,6 +527,7 @@ window.loadAll = (e) => {
                     window.top.log("ok", `| Complete (map): ${url}`);
                     e.name = name;
                     all_map[url] = e;
+                    e.receiveShadow = true;
                     _loading.load++;
                     tur++;
                     element.innerText = "Ok";
@@ -454,6 +547,7 @@ window.loadAll = (e) => {
                     window.top.log("ok", `| Complete (map): ${url}`);
                     e.name = name;
                     all_map[url] = e;
+                    e.receiveShadow = true;
                     _loading.load++;
                     tur++;
                     element.innerText = "Ok";
@@ -462,7 +556,6 @@ window.loadAll = (e) => {
                     } else {
                         // addAll();
                         loadAudio();
-
                     }
                 }, (e) => {
                     loading(e, "map/object");
@@ -524,7 +617,6 @@ window.loadAll = (e) => {
         for (const k in all_audio) {
             if(all_audio[k].isUse){
                 helper.add(all_audio[k].audio);
-                break;
             }
         }
         if(all_cam){
@@ -532,14 +624,15 @@ window.loadAll = (e) => {
                 animation: all_cam
             });
         }
-        ready = true;
         animate();
         if (window.top._meshManager) {
             window.top._meshManager.append();
             window.top.anyChange();
-            addCall(()=>window.top._meshManager.updateMorph(window.top._meshManager.mesh));
+            runner.addCall(() => window.top._meshManager.updateMorph(window.top._meshManager.mesh));
 
         }
+        ready = true;
+
         window.top.log("ok", `| Complete all`);
         
     }
@@ -613,41 +706,14 @@ window.onWindowResize = () => {
 
 //
 window.animate = function () {
-    window.requestAnimationFrame(animate);
-    render();
-    for (let i = 0; i < window.callAnimate.length; i++) {
-        const f = window.callAnimate[i];
-        if (!f) continue;
-        if(typeof f.function === "function"){
-            f.function.call();
-        }
-    }
+    runner.start();
 }
-window.addCall = (f) => {
-    if(typeof f === "function"){
-        var id = performance.now()
-        window.callAnimate.push({function: f, id: id});
-        return id;
-    }
-}
-window.removeCall = (id) => {
-    for (let i = 0; i < window.callAnimate.length; i++) {
-        const f = window.callAnimate[i];
-        if(f.id == id){
-            window.callAnimate.splice(i, 1);
-            return;
-        }
-    }
-    if(typeof f === "function"){
-        var id = performance.now()
-        window.callAnimate.push({function: f, id: id});
-        return id;
-    }
-}
+runner.addCall(render);
+
 function render() {
     var t = clock.getDelta();
     window.delta = t;
-    checkTime++;
+    // t = 0.019;
 
     if (ready) {
         helper.update(t);
@@ -661,16 +727,14 @@ function render() {
 }
 
 //sample check fps maybe not true
-setInterval(() => {
-    fps = checkTime;
-    checkTime = 0;
+runner.onSecond = (stat) => {
     let a = window.top.document.querySelector(".-render-fps");
     let b = window.top.document.querySelector(".-objects-render");
-    a.innerText = `FPS: ${fps}`;
+    a.innerText = `FPS: ${stat.fps} - ${stat.fps_2}`;
     if(scene){
         b.innerText = `Objects: ${scene.children.length}`;
     }
-}, 999);
+};
 
 function setUpControl(opt = {}){
     let cont = document.querySelector(".control-ui");

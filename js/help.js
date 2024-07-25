@@ -165,11 +165,11 @@ class FileControl{
         .mor-value{ border: 1px solid #ddd; position: relative; width: 100%; height: 20px; }
         .mor-value > div{ position: absolute; top: 0; width: 5px; height: 100%; background-color: #00ffff; left: 20px; }
         .mmd-container { position: absolute; left: 0; top: 40px; width: 100%; height: calc(100% - 40px); display: flex; flex-direction: row; flex-wrap: wrap; user-select: none; overflow-y: scroll; background: #000000d3; }
-        .mmd-block { position: relative; width: 480px; height: 245px; border: 1px solid #ddd; display: flex; flex-direction: row; margin: 5px; }
+        .mmd-block { position: relative; width: 475px; height: 240px; border: 1px solid #ddd; display: flex; flex-direction: row; margin: 5px; }
         .big-block{ width: 600px; }
         .m-box { position: relative; width: calc(50% - 15px); height: 100%; overflow-y: scroll; display: flex; flex-direction: column; }
         .mid-control { position: relative; width: 30px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .mid-ct-btn { font-size: 1.9em; border: 1px solid #ddd; width: 28px; text-align: center; margin: 4px 0px 4px 0px; }
+        .mid-ct-btn { font-size: 2em; border: 1px solid #ddd; width: 28px; text-align: center; margin: 4px 0px 4px 0px; }
         .mid-ct-btn:hover { border: 1px solid #00ffff; color: #00ffff; }
         .mmd-box-left { border-right: 1px solid #ddd; }
         .mmd-box-right { border-left: 1px solid #ddd; }
@@ -367,12 +367,12 @@ class MeshManager{
         this.mesh = this.getMesh(this.scene);
         var htName = "";
         var htMesh = "";
-        
         for (let i = 0; i < this.mesh.length; i++) {
             const e = this.mesh[i];
             htName += `<div class="mesh-item" role="button" data-id="${e.uuid}" title="${e.name}">${e.name}</div>`;
             var htMaterial = "";
             var htMorph = "";
+
             for (let k = 0; k < e.material.length; k++) {
                 const m = e.material[k];
                 htMaterial += this._getHtmlMaterial({uuid: e.uuid, k, name: m.name});
@@ -440,13 +440,13 @@ class MeshManager{
             e.remove();
         });
 
-        var htName = "";
         var htMesh = "";
+        var htName = "";
         for (let i = 0; i < needAdd.length; i++) {
             const e = needAdd[i];
             htName += `<div class="mesh-item" role="button" data-id="${e.uuid}" title="${e.name}">${e.name}</div>`;
-            var htMaterial = "";
             var htMorph = "";
+            var htMaterial = "";
             if (!e.material) {
                 htMesh += this._getHtmlCont({ htMaterial, e });
             continue;
@@ -533,6 +533,7 @@ class MeshManager{
         function c(value){ return value ? value : 0 }
     }
     updateMorph(meshs){
+        'use strict';
         if (!Array.isArray(meshs)){
             meshs = [meshs];
         }
@@ -1126,9 +1127,9 @@ class RecordVideo{
 
 class AudioCtx{
     /**
-     * Note: From another pj then just use something
-     * @param {HTMLVideoElement | HTMLAudioElement | String | undefined} audio video/audio tag or video/audio selector
-     * @param {HTMLCanvasElement | String | undefined} canvas canvas to render or selector canvas
+     * 
+     * @param {HTMLVideoElement | HTMLAudioElement | String} audio video/audio tag or video/audio selector
+     * @param {HTMLCanvasElement | String} canvas canvas to render or selector canvas
      * @param {Object} option 
      * @returns 
      */
@@ -1451,4 +1452,249 @@ class AudioCtx{
             }
         }
     }
+}
+
+
+class AnimationRunner{
+    /**
+     * 
+     * @param {Number | Boolean} fps set fps animation use number or "true" for maximum with requestAnimationFrame()
+     * @param {Boolean} advancedInfo cpu and ram info - only on extension
+     */
+    constructor(fps = true, advancedInfo){
+        this.running = false;
+        this.isStarted = false;
+        this.fps = fps;
+        this.advancedInfo = advancedInfo;
+        this.stat = {};
+        this.stat.fps = 0;
+        this.stat.fps_2 = 0;
+        this.stat.time = 0;
+
+        this.systemInfo = {
+            cpu: null,
+            ram: null
+        }
+        this._check = 0;
+        this._runner = 0;
+        this._interval = 0;
+        this.functions = [];
+        this.onSecond = null;
+        if (location.href.indexOf("chrome-extension://") !== -1) {
+            this.isExtension = true;
+            if (advancedInfo) {
+                if (chrome.system) {
+                    if (chrome.system.cpu && chrome.system.memory) {
+                        this.isSupport = true;
+                        this._getSystemInfo();
+                    } else{
+                        this.isSupport = false;
+                    }
+                } else{
+                    this.isSupport = false;
+                }
+            } 
+        } else{
+            console.warn(`Advanced info only on chrome extension`);
+        }
+    }
+    /**
+     * 
+     * @param {Number | undefined} delay delay time to start run
+     */
+    start(delay){
+        if(this.isStarted) {
+            console.warn("Animation is running");
+            return;
+        };
+        this.isStarted = true;
+        const scope = this;
+        this._per = performance.now();
+        if(typeof delay === "number"){
+            setTimeout(callFunctions, delay);
+        } else{
+            callFunctions();
+        }
+        function callFunctions(){
+            var now = Date.now();
+            var per = performance.now();
+            var del = (1000 / (per - scope._per));
+            scope.stat.fps_2 = Math.round(del);
+            scope._per = per;
+            scope.running = true;
+
+            if(scope.fps === true){
+                scope._runner = requestAnimationFrame(callFunctions);
+            } else if(typeof scope.fps === "number" && scope.fps > 0){
+                scope._runner = setTimeout(callFunctions, 1000 / scope.fps);
+            } else {
+                scope._runner = requestAnimationFrame(callFunctions);
+            }
+
+            for (let i = 0; i < scope.functions.length; i++) {
+                const f = scope.functions[i];
+                if(f){
+                    if(typeof f.function === "function"){
+                        f.function(f.id);
+                    }
+                }
+            }
+            scope.stat.time = Date.now() - now;
+            scope._check ++;
+        }
+        this._interval = setInterval(() => {
+            scope.stat.fps = scope._check;
+            scope._check = 0;
+            if(scope.advancedInfo){
+                this._getSystemInfo();
+            }
+            if(performance.memory){
+                let free = performance.memory.jsHeapSizeLimit - performance.memory.usedJSHeapSize;
+                scope.stat.memory = (free/1024/1024).toFixed(2)*1; 
+                scope.stat.percentMem = (performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit) * 100;
+            }
+            if(typeof scope.onSecond === "function") scope.onSecond(scope.stat);
+        }, 999);
+    }
+
+    stop(){
+        if(!this.isStarted) {
+            console.warn("Animation is not running to stop");
+            return;
+        };
+        try {
+            clearInterval(this._interval);
+            clearTimeout(this._runner);
+            cancelAnimationFrame(this._runner);
+            this.stat.fps = 0;
+            this.stat.fps_2 = 0;
+            this.running = false;
+            this.isStarted = false;
+        } catch (er) { }
+    }
+    async _getSystemInfo() {
+        if (this.isExtension && this.isSupport) {
+            if(!this.systemInfo.cpu){
+                this.systemInfo.cpu = await chrome.system.cpu.getInfo();
+                this._getSystemInfo();
+                return;
+            }
+            var cpu = await chrome.system.cpu.getInfo();
+            var total = 0;
+            let core = [];
+
+            for (let i = 0; i < cpu.processors.length; i++) {
+                core[i] = ((cpu.processors[i].usage.kernel + cpu.processors[i].usage.user - this.systemInfo.cpu.processors[i].usage.kernel - this.systemInfo.cpu.processors[i].usage.user) / (cpu.processors[i].usage.total - this.systemInfo.cpu.processors[i].usage.total) * 100);
+                total += core[i];
+            }
+            if (!this.stat.cpu) this.stat.cpu = {};
+            this.stat.cpu.used = (total / cpu.processors.length).toFixed(1)*1;
+            this.stat.cpu.core = core;
+            this.systemInfo.cpu = cpu;
+
+            var ram = await chrome.system.memory.getInfo();
+            let mem = ram.availableCapacity / 1024 / 1024;
+            this.systemInfo.ram = ram;
+            if (!this.stat.ram) this.stat.ram = {};
+            this.stat.ram.free = mem;
+            this.stat.ram.total = ram.capacity / 1024 / 1024;
+            this.stat.ram.used = ((ram.capacity - ram.availableCapacity) / ram.capacity) * 100;
+        }
+    }
+    /**
+     * 
+     * @param {Function} f add function to run in animation
+     * @returns {Number} id that can use to remove this function
+     */
+    addCall(f){
+        if(typeof f === "function"){
+            let id = Math.random() * 1E9 | 0;
+            this.functions.push({
+                id: id,
+                function: f
+            });
+            return id;
+        } else {
+            throw new Error(`${f} - not a function`);
+        }
+    }
+    /**
+     * 
+     * @param {Function | Number} id id or same function to remove
+     * @returns {Boolean} is function removed
+     */
+    removeCall(id){
+        if(typeof id === "function" || typeof id === "number"){
+            for (let i = 0; i < this.functions.length; i++) {
+                const f = this.functions[i];
+                if(typeof id === "function"){
+                    if(f.function === id){
+                        this.functions.splice(i, 1);
+                        return true;
+                    }
+                    continue;
+                }
+                if(f.id === id){
+                    this.functions.splice(i, 1);
+                    return true;
+                }
+            }
+        }
+    }
+    /**
+     * 
+     * @param {Number | Boolean} fps set fps animation use number or "true" for maximum with requestAnimationFrame()
+     */
+    setFps(fps = true){
+        this.fps = fps;
+        return this;
+    }
+}
+
+class ValueManager{
+    constructor(){
+        this.list = [];
+    }
+    updateAll(){
+        for (let i = 0; i < this.list.length; i++) {
+            const e = this.list[i];
+            if(e.valueTarget && e.keyV && e.target && e.keyT){
+                if(e.oldValue !== e.valueTarget[e.keyV]){
+                    e.target[e.keyT] = e.valueTarget[e.keyV];
+                    e.oldValue = e.target[e.keyT];
+                }
+            }
+        }
+    }
+    /**
+     * 
+     * @param {Object} valueTarget Obj
+     * @param {String} key key for Obj
+     * @param {Object} target Obj need to update
+     * @param {String} keyT key to change value
+     */
+    add(valueTarget, key, target, keyT) {
+        let id = Math.random() * 1E9 | 0;
+        this.list.push({
+            valueTarget: valueTarget,
+            keyV: key,
+            target: target,
+            keyT: keyT,
+            oldValue: target[keyT],
+            id:id
+        });
+        return this;
+    }
+    remove(id){
+        if(typeof id == "number"){
+            for (let i = 0; i < this.list.length; i++) {
+                const f = this.list[i];
+                if(f.id === id){
+                    this.list.splice(i, 1);
+                    return true;
+                }
+            }
+        }
+    }
+
 }

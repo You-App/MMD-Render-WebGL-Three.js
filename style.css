@@ -589,3 +589,7 @@ label.label-inp {
     color: #ff0000;
     background-color: #ff000035;
 }
+.graph-title {
+    margin: 6px 1px;
+    font-size: 1.2em;
+}

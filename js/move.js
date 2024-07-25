@@ -13,7 +13,9 @@ class Move3d {
         this.zoom = option.zoom ? option.zoom : 2;
         this.pos = option.position ? option.position : [0,0,0];
         this.keyStates = {};
+        this.old = {x: 0, y: 0};
         this.fast = false;
+        this.locked = false;
         this.playerCollider = new Capsule(new Vector3(0, 0.35, 0), new Vector3(0, 1, 0), 0.35);
         this.playerVelocity = new Vector3();
         this.playerDirection = new Vector3();
@@ -45,19 +47,30 @@ class Move3d {
         document.addEventListener('mouseup', () => {
         
         });
-        
+        document.addEventListener('pointerlockchange', () => {
+            if(document.pointerLockElement){
+                this.locked = true;
+            } else{
+                this.locked = false;
+            }
+        });
         document.body.addEventListener('mousemove', (event) => {
-            if (document.pointerLockElement === document.body) {
+            if (document.pointerLockElement && this.locked) {
                 var d1 = this.camera.rotation.x - event.movementY / 500;
                 // var d2 = this.camera.rotation.y - event.movementX / 500;
+                this.old.y = this.camera.rotation.y;
                 this.camera.rotation.y -= event.movementX / 500;
-                if(d1 >= -1.49 && d1 <= 1.49){
+                if (d1 >= -1.49 && d1 <= 1.49) {
+                    this.old.x = this.camera.rotation.x;
                     this.camera.rotation.x -= event.movementY / 500;
                 }
+            } else{
+                // this.camera.rotation.y = this.old.x;
+                // this.camera.rotation.x = this.old.y;
             }
         });
     }
-    lockmouse(){
+    lock(){
         document.body.requestPointerLock();
     }
     update(clock = 1){

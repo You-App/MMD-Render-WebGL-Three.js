@@ -1,5 +1,6 @@
 # MMD-Render-WebGL-Three.js
-[beta] Render/ open .pmx | zip file use ThreeJs + JSZip.
+# (late update) MMD module was removed from threejs modules in r172
+[Fun] Render/ open .pmx | zip file use ThreeJs + JSZip.
 - Render MMD on webgl and record 
 - (I code for fun)
 - This page maybe hard to use I will add "how to use" later

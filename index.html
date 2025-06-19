@@ -3,238 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MMD</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="lib/jszip/jszip.min.js"></script>
+    <title>MMD Glass Editor</title>
+    <link rel="stylesheet" href="https://you-app.github.io/MMD-Render-WebGL-Three.js/style.css">
+    <script src="https://you-app.github.io/MMD-Render-WebGL-Three.js/lib/jszip/jszip.min.js"></script>
     <script type="importmap">
         {
             "imports": {
-                "three": "./lib/three/build/r158.js",
-                "three/addons/": "./lib/three/jsm/"
+                "three": "https://you-app.github.io/MMD-Render-WebGL-Three.js/lib/three/build/r158.js",
+                "three/addons/": "https://you-app.github.io/MMD-Render-WebGL-Three.js/lib/three/jsm/"
             }
         }
     </script>
-    <script type="module" src="get.js"></script>
-    <script src="js/help.js"></script>
+    <style>
+        /* Добавляем стили стеклянного морфизма */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            color: white;
+        }
+        
+        .glass-button {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .file-plate {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin: 5px 0;
+            cursor: move;
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Адаптивная сетка кнопок */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 10px;
+            justify-content: center;
+            padding: 10px;
+        }
+        
+        /* Стили для мобильных устройств */
+        @media (max-width: 768px) {
+            .button-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .content {
+                flex-direction: column;
+            }
+            
+            .left-menu, .right-menu {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="main-content">
         <div class="inner">
-            <div class="top-bar">
+            <!-- Верхняя панель (упрощенная) -->
+            <div class="top-bar glass-panel">
                 <div class="top-bar-list">
-                    <div class="top-select open-drop-menu">File</div>
-                    <div class="top-select open-mini-info">Info</div>
-                    <div class="top-select">Beta</div>
-                </div>
-                <div class="menus">
-                    <div class="menu-box file-drop-menu">
-                        <div class="item-box-menu open-zip-mode">Open Zip (To Model)</div>
-                        <div class="item-box-menu open-zip-mode-vmd">Open Zip (To VMD)</div>
-                        <div class="item-box-menu open-zip-mode-map">Open Zip (To Map)</div>
-                        <div class="item-box-menu open-file-cam">Open File vmd (camera)</div>
-                        <div class="item-box-menu open-file-mot">Open File (motion)</div>
-                        <div class="item-box-menu open-file-obj">Open File (.obj)</div>
-                        <div class="item-box-menu open-file-obj">Open File (audio)</div>
-
-                    </div>
-                    <div class="menu-box info-menu">
-                        <div>This page I code for fun</div>
-                        <div>Maybe hard to use</div>
-                        <div>Some demo on</div>
-                        <div>Github:</div>
-                        <a class="cs-url" href="https://github.com/anhhao00777/MMD-Render-WebGL-Three.js" target="_blank">Repositorie</a>
-                    </div>
-
+                    <div class="top-select">MMD Glass Editor</div>
                 </div>
             </div>
+            
             <div class="content">
-                <div class="left-menu">
+                <!-- Левое меню (упрощенное) -->
+                <div class="left-menu glass-panel">
                     <div class="lf-container">
                         <div class="top-selection">
-                            <div class="option-lf" data-for="#setup-render">Setup</div>
-                            <div class="option-lf" data-for="#window-log">Log</div>
+                            <div class="option-lf -option-show-">Controls</div>
                         </div>
                         <div class="list-container">
-                            <div class="cont-item -option-show-" id="setup-render">
+                            <div class="cont-item">
                                 <div class="cs-btn" id="load-all">Load All</div>
                             </div>
-                            <div class="cont-item" id="window-log">
-                                <div class="log-content"></div>
-                            </div>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Основная область рендеринга -->
                 <div class="render">
+                    <!-- Контейнер для сцены -->
                     <div class="render-contaner">
-                        <iframe src="renderFrame/render.html" id="main-render"></iframe>
+                        <div id="scene-container" style="width:100%; height:100%;"></div>
                     </div>
-                    <div class="bottom-tool">
-                        <div class="time-panel">
-                            <div class="bar-time animation-time">
-                                <div class="bar-time-current">00:00</div>
-                                <div class="bar-progress"><div class="prog-bar"></div><div class="overlay"></div></div>
-                                <div class="bar-time-duration">00:00</div>
-                            </div>
-                            <div class="time-control">
-                                <div class="pri-control">
-                                    <div class="cs-btn play-mode" role="button" title="Play/Pause Animation">Pause</div>
-                                    <div class="cs-btn play-sync" role="button">Sync</div>
-                                    <div class="cs-btn get-render-image" role="button">Screenshot</div>
-                                </div>
-                                <div class="sec-control">
-                                    <div class="time-sync">
-                                        <div role="button">00</div>
-                                        <div role="button">25</div>
-                                        <div role="button">50</div>
-                                        <div role="button">75</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bar-time camera-time">
-                                <div class="bar-time-current">00:00</div>
-                                <div class="bar-progress"><div class="prog-bar"></div><div class="overlay"></div></div>
-                                <div class="bar-time-duration">00:00</div>
-                            </div>
-                            <div class="camera-control">
-                                <div class="pri-control">
-                                    <div class="cs-btn play-mode" role="button" title="Play/Pause Camera Animation">Pause</div>
-                                </div>
-                                <div class="sec-control">
-                                    
-                                </div>
-                            </div>
-                            <div class="tit">Record Video</div>
-                            <div class="record-canvas">
-                                <div class="rec-item">
-                                    <div class="cs-btn start-record">Start</div>
-                                </div>
-                                <div class="rec-item type-video">
-                                    <div class="tit">Video Type</div>
-                                    <select class="cs-select-input" id="record-type">
-                                        <option value="video/mp4">video/mp4</option>
-                                        <option value="video/webm;codecs=daala">video/webm;codecs=daala</option>
-                                        <option value="video/webm;codecs=h264" selected>video/webm;codecs=h264</option>
-                                        <option value="video/webm;codecs=vp8">video/webm;codecs=vp8</option>
-                                        <option value="video/webm">video/webm</option>
-                                    </select>
-                                </div> 
-                                <div class="rec-item fps-video">
-                                    <div class="tit">Video FPS</div>
-                                    <select class="cs-select-input" id="record-fps">
-                                        <option value="60">60</option>
-                                        <option value="45">45</option>
-                                        <option value="30" selected>30</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                </div> 
-                                <div class="rec-item current-time-video">
-                                    <div class="tit">Record Time</div>
-                                    <div class="current-record">00:00</div>
-                                </div>   
-                                <div class="rec-item max-time-video">
-                                    <div class="tit">Max Time (Second)</div>
-                                    <input type="number" id="max-record" value="60">
-                                </div>    
-                            </div>
+                    
+                    <!-- Сетка стеклянных кнопок -->
+                    <div class="button-grid">
+                        <div class="glass-button" data-panel="model">
+                            <span>Model</span>
+                        </div>
+                        <div class="glass-button" data-panel="camera">
+                            <span>Camera</span>
+                        </div>
+                        <div class="glass-button" data-panel="dance">
+                            <span>Dance</span>
+                        </div>
+                        <div class="glass-button" data-panel="objects">
+                            <span>Objects</span>
+                        </div>
+                        <div class="glass-button" data-panel="audio">
+                            <span>Audio</span>
                         </div>
                     </div>
+                    
+                    <!-- Панели настроек -->
+                    <div class="settings-panels">
+                        <!-- Панель модели -->
+                        <div class="glass-panel model-panel" style="display:none;">
+                            <h3>Model Settings</h3>
+                            <div class="upper-section">
+                                <!-- Сюда будут переноситься выбранные плашки -->
+                            </div>
+                            <div class="lower-section">
+                                <!-- Плашки с названиями файлов -->
+                                <div class="file-plate">model1.pmx</div>
+                                <div class="file-plate">model2.pmx</div>
+                                <div class="file-plate">model3.pmx</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Остальные панели (аналогичная структура) -->
+                        <div class="glass-panel camera-panel" style="display:none;">
+                            <h3>Camera Settings</h3>
+                            <div class="upper-section"></div>
+                            <div class="lower-section">
+                                <div class="file-plate">camera1.vmd</div>
+                                <div class="file-plate">camera2.vmd</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Аналогичные блоки для dance, objects, audio -->
+                    </div>
                 </div>
-                <div class="right-menu">
+                
+                <!-- Правое меню (упрощенное) -->
+                <div class="right-menu glass-panel">
                     <div class="rt-container">
                         <div class="top-selection">
-                            <div class="option-rt" data-for="#mesh-view-option">Mesh View</div>
-                            <div class="option-rt" data-for="#graph-render-option">Graph</div>
+                            <div class="option-rt -option-show-">Graphics</div>
                         </div>
                         <div class="list-container">
-                            <div class="cont-item -option-show-" id="mesh-view-option"></div>
-                            <div class="cont-item" id="graph-render-option">
-                                <div class="graph-title">Quality</div>
+                            <div class="cont-item">
                                 <select class="cs-select-input" id="graph-render-qualiti">
-                                    <option value="500">500</option>
-                                    <option value="720">720</option>
-                                    <option value="1080">1080</option>
-                                    <option value="auto" selected>auto</option>
+                                    <option value="auto" selected>Auto Quality</option>
+                                    <!-- остальные опции -->
                                 </select>
-                                <div class="graph-title">Quality +</div>
-                                <select class="cs-select-input" id="graph-render-qualiti-plus"><option value="0.5">0.5</option><option value="0.6">0.6</option><option value="0.7">0.7</option><option value="0.8">0.8</option><option value="0.9">0.9</option>
-                                    <option value="1" selected>1.0</option>
-                                    <option value="1.2">1.2</option><option value="1.4">1.4</option><option value="1.6">1.6</option><option value="1.7">1.7</option><option value="1.8">1.8</option><option value="1.9">1.9</option><option value="2">2.0</option>
-                                    <option value="3">3.0</option>
-                                    <option value="3.5">3.5</option>
-                                    <option value="4">4.0</option>
-                                </select>
-                                <div class="graph-title">Render ratio</div>
-                                <select class="cs-select-input" id="graph-render-ratio">
-                                    <option value="4:3">4:3</option>
-                                    <option value="16:9">16:9</option>
-                                    <option value="32:9">32:9</option>
-                                    <option value="auto" selected>auto</option>
-                                </select>
-                                <div class="graph-title">Max FPS</div>
-                                <select class="cs-select-input" id="graph-render-fps">
-                                    <option value="max" selected>MAX</option>
-                                    <option value="40">40</option>
-                                    <option value="30">30</option>
-                                    <option value="20">20</option>
-                                    <option value="10">10</option>
-                                </select>
-                                <div class="graph-title">Outline Effect</div>
-                                <select class="cs-select-input" id="graph-render-outline">
-                                    <option value="on" selected>ON</option>
-                                    <option value="">OFF</option>
-                                </select>
-                                <div class="graph-title">Shadow</div>
-                                <select class="cs-select-input" id="graph-render-shadow">
-                                    <option value="on" selected>ON</option>
-                                    <option value="">OFF</option>
-                                </select>
-                                <div class="graph-title">ColorSpace</div>
-                                <select class="cs-select-input" id="graph-render-colorspace">
-                                    <option value="srgb-linear" selected>LinearSRGBColorSpace</option>
-                                    <option value="srgb">SRGBColorSpace</option>
-                                    <option value="">NoColorSpace</option>
-                                </select>
-                                <div class="graph-title">ToneMapping</div>
-                                <select class="cs-select-input" id="graph-render-mapping">
-                                    <option value="ACESFilmicToneMapping">ACESFilmicToneMapping</option>
-                                    <option value="LinearToneMapping" selected>LinearToneMapping</option>
-                                    <option value="CineonToneMapping">CineonToneMapping</option>
-                                    <option value="ReinhardToneMapping">ReinhardToneMapping</option>
-                                    <option value="NoToneMapping">NoToneMapping</option>
-                                </select>
-                                <div class="graph-title">ToneMapping</div>
-                                <input type="number" id="graph-render-tone-ex" min="0.1" max="3" step="0.1" value="1.1">
-                                <div class="graph-title">Light Type</div>
-                                <select class="cs-select-input" id="graph-render-light">
-                                    <option value="0">Custom</option>
-                                    <option value="1" selected>Light</option>
-                                    <option value="2">Night</option>
-                                </select>
-
-
-                                <h2>For dev:</h2>
-                                <div class="cs-btn reload-all-style">Reload CSS</div>
-
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="bottom-bar">
+            
+            <!-- Нижняя панель -->
+            <div class="bottom-bar glass-panel">
                 <div class="bottom-left">
-                    <div class="bottom-item -total-err"></div>
-                    <div class="bottom-item -progress-info"></div>
-                    <div class="bottom-item -error-info"></div>
-
+                    <div class="bottom-item -render-fps">FPS: 60</div>
                 </div>
                 <div class="bottom-right">
-                    <div class="bottom-item"></div>
-                    <div class="bottom-item -render-size"></div>
-                    <div class="bottom-item -render-fps"></div>
-                    <div class="bottom-item -objects-render"></div>
+                    <div class="bottom-item -render-size">1920x1080</div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script type="module">
+        // Переносим содержимое render.html в index.html
+        
+        // Стили сцены
+        const sceneStyles = `
+            #scene-container {
+                position: relative;
+                width: 100%;
+                height: 100%;
+            }
+            
+            .loadd {
+                position: absolute;
+                background: rgba(0,0,0,0.7);
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                z-index: 9;
+            }
+            
+            canvas {
+                display: block;
+                width: 100% !important;
+                height: 100% !important;
+            }
+        `;
+        
+        // Добавляем стили в документ
+        const styleSheet = document.createElement("style");
+        styleSheet.textContent = sceneStyles;
+        document.head.appendChild(styleSheet);
+        
+        // Создаем контейнер для загрузки
+        const sceneContainer = document.getElementById('scene-container');
+        const loaderDiv = document.createElement('div');
+        loaderDiv.className = 'loadd';
+        loaderDiv.innerHTML = `
+            <div class="load-cont">
+                <div class="load-bar">
+                    <div class="bar" style="width:0%"></div>
+                </div>
+                <div class="load-progr">0%</div>
+            </div>
+        `;
+        sceneContainer.appendChild(loaderDiv);
+        
+        // Создаем canvas для рендеринга
+        const canvas = document.createElement('canvas');
+        sceneContainer.appendChild(canvas);
+        
+        // Инициализация Three.js сцены
+        import * as THREE from 'three';
+        import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        
+        // Ваш код инициализации сцены из render.js
+        // (здесь должен быть код инициализации Three.js сцены)
+        // Для примера - базовая сцена:
+        
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
+        
+        // Освещение
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(0, 1, 1);
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0x404040));
+        
+        // Контролы
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        
+        // Загрузка модели
+        const loader = new MMDLoader();
+        loader.load(
+            'https://you-app.github.io/MMD-Render-WebGL-Three.js/models/chiori/chiori.pmx',
+            (object) => {
+                scene.add(object);
+                loaderDiv.style.display = 'none';
+            },
+            (progress) => {
+                const percent = Math.round(progress.loaded / progress.total * 100);
+                loaderDiv.querySelector('.bar').style.width = `${percent}%`;
+                loaderDiv.querySelector('.load-progr').textContent = `${percent}%`;
+            },
+            (error) => {
+                console.error('Error loading model:', error);
+            }
+        );
+        
+        camera.position.z = 10;
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        // Адаптивность
+        window.addEventListener('resize', () => {
+            camera.aspect = sceneContainer.clientWidth / sceneContainer.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
+        });
+        
+        // Логика стеклянных кнопок
+        const buttons = document.querySelectorAll('.glass-button');
+        const panels = document.querySelectorAll('.settings-panels > div');
+        
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const panelId = button.dataset.panel;
+                
+                // Скрыть все панели
+                panels.forEach(panel => {
+                    panel.style.display = 'none';
+                });
+                
+                // Показать соответствующую панель
+                const targetPanel = document.querySelector(`.${panelId}-panel`);
+                if (targetPanel) {
+                    targetPanel.style.display = 'block';
+                }
+            });
+        });
+        
+        // Drag-and-drop для плашек
+        const filePlates = document.querySelectorAll('.file-plate');
+        const upperSections = document.querySelectorAll('.upper-section');
+        
+        filePlates.forEach(plate => {
+            plate.setAttribute('draggable', 'true');
+            
+            plate.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', plate.textContent);
+            });
+        });
+        
+        upperSections.forEach(section => {
+            section.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                section.style.backgroundColor = 'rgba(255,255,255,0.2)';
+            });
+            
+            section.addEventListener('dragleave', () => {
+                section.style.backgroundColor = '';
+            });
+            
+            section.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const fileName = e.dataTransfer.getData('text/plain');
+                
+                // Создаем новую плашку в верхней секции
+                const newPlate = document.createElement('div');
+                newPlate.className = 'file-plate';
+                newPlate.textContent = fileName;
+                section.appendChild(newPlate);
+                
+                section.style.backgroundColor = '';
+            });
+        });
+        
+        // Кнопка Load All
+        document.getElementById('load-all').addEventListener('click', () => {
+            alert('Loading selected content...');
+            // Здесь будет логика загрузки выбранного контента
+        });
+    </script>
 </body>
 </html>

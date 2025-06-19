@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MMD Glass UI</title>
+    <title>MMD Scene Editor</title>
     <link rel="stylesheet" href="style.css">
     <script src="lib/jszip/jszip.min.js"></script>
     <script type="importmap">
@@ -16,54 +16,124 @@
     </script>
     <script type="module" src="get.js"></script>
     <script src="js/help.js"></script>
+    <script src="lib/three/jsm/libs/ammo.wasm.js"></script>
+    <script type="module" src="renderFrame/render.js"></script>
 </head>
 <body>
-    <div class="glass-ui">
+    <div class="glass-container">
         <!-- Кнопки управления -->
         <div class="control-buttons">
-            <button class="glass-btn" data-panel="model">Модель</button>
-            <button class="glass-btn" data-panel="camera">Камера</button>
-            <button class="glass-btn" data-panel="dance">Танец</button>
-            <button class="glass-btn" data-panel="objects">Объекты</button>
-            <button class="glass-btn" data-panel="audio">Аудио</button>
+            <button class="glass-button round" data-panel="model-panel">Модель</button>
+            <button class="glass-button round" data-panel="camera-panel">Камера</button>
+            <button class="glass-button round" data-panel="dance-panel">Танец</button>
+            <button class="glass-button round" data-panel="objects-panel">Объекты</button>
+            <button class="glass-button round" data-panel="audio-panel">Аудио</button>
         </div>
         
         <!-- Панели настроек -->
-        <div class="panel-container">
-            <div id="model-panel" class="glass-panel">
-                <h3>Модели</h3>
-                <div class="file-list" id="model-list"></div>
+        <div id="model-panel" class="glass-panel">
+            <h3>Модели</h3>
+            <div class="drop-area" id="model-selected-area">
+                <!-- Выбранные файлы будут здесь -->
             </div>
-            <!-- Аналогичные блоки для других панелей -->
+            <div class="file-list" id="model-file-list">
+                <!-- Список файлов будет загружен динамически -->
+            </div>
+        </div>
+        
+        <div id="camera-panel" class="glass-panel">
+            <h3>Настройки камеры</h3>
+            <div class="drop-area" id="camera-selected-area"></div>
+            <div class="file-list" id="camera-file-list"></div>
+        </div>
+        
+        <div id="dance-panel" class="glass-panel">
+            <h3>Танцевальные движения</h3>
+            <div class="drop-area" id="dance-selected-area"></div>
+            <div class="file-list" id="dance-file-list"></div>
+        </div>
+        
+        <div id="objects-panel" class="glass-panel">
+            <h3>Объекты сцены</h3>
+            <div class="drop-area" id="objects-selected-area"></div>
+            <div class="file-list" id="objects-file-list"></div>
+        </div>
+        
+        <div id="audio-panel" class="glass-panel">
+            <h3>Аудио дорожки</h3>
+            <div class="drop-area" id="audio-selected-area"></div>
+            <div class="file-list" id="audio-file-list"></div>
         </div>
         
         <!-- Кнопка загрузки -->
-        <button class="glass-btn load-all">Load All</button>
+        <button id="load-all" class="glass-button load-all">Load All</button>
+        
+        <!-- Контейнер для 3D сцены -->
+        <div id="scene-container"></div>
+        
+        <!-- UI управления -->
+        <div class="control-ui">
+            <div class="lock-menu">
+                <!-- Меню управления остаётся без изменений -->
+            </div>
+            <div class="bottom-tips">
+                <!-- Подсказки управления -->
+            </div>
+        </div>
     </div>
 
-    <!-- Контейнер для рендера -->
-    <div id="render-container"></div>
-
     <script>
-        // Переносим содержимое render.html
-        const renderContainer = document.getElementById('render-container');
-        const renderFrame = document.createElement('div');
-        renderFrame.innerHTML = `
-            <!-- Содержимое из render.html -->
-            <script src="../lib/three/jsm/libs/ammo.wasm.js"><\/script>
-            <script type="module" src="renderFrame/render.js"><\/script>
-        `;
-        renderContainer.appendChild(renderFrame);
-        
-        // Логика панелей
-        document.querySelectorAll('.glass-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const panelId = this.dataset.panel + '-panel';
-                document.querySelectorAll('.glass-panel').forEach(p => {
-                    p.style.display = p.id === panelId ? 'block' : 'none';
-                });
+        // Управление панелями
+        document.querySelectorAll('.glass-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const panelId = this.getAttribute('data-panel');
+                if(panelId) {
+                    const allPanels = document.querySelectorAll('.glass-panel');
+                    allPanels.forEach(panel => {
+                        if(panel.id === panelId) {
+                            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+                        } else {
+                            panel.style.display = 'none';
+                        }
+                    });
+                }
             });
         });
+
+        // Загрузка контента
+        document.getElementById('load-all').addEventListener('click', function() {
+            // Здесь будет логика загрузки выбранного контента
+            alert('Загрузка выбранного контента...');
+        });
+
+        // Загрузка файлов (заглушка)
+        function loadFileList() {
+            const lists = document.querySelectorAll('.file-list');
+            lists.forEach(list => {
+                list.innerHTML = `
+                    <div class="file-item" data-file="file1.pmx">File 1.pmx</div>
+                    <div class="file-item" data-file="file2.vmd">File 2.vmd</div>
+                    <div class="file-item" data-file="file3.mp3">File 3.mp3</div>
+                `;
+            });
+            
+            // Обработка выбора файлов
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const file = this.getAttribute('data-file');
+                    const panel = this.closest('.glass-panel').id;
+                    const targetArea = document.querySelector(`#${panel.replace('-panel', '-selected-area')}`);
+                    
+                    const fileBadge = document.createElement('div');
+                    fileBadge.className = 'file-badge';
+                    fileBadge.textContent = file;
+                    targetArea.appendChild(fileBadge);
+                });
+            });
+        }
+        
+        // Инициализация при загрузке
+        window.addEventListener('DOMContentLoaded', loadFileList);
     </script>
 </body>
 </html>
